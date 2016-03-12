@@ -18,16 +18,28 @@ package com.elmargomez.dominohttp;
 
 import java.util.concurrent.BlockingQueue;
 
-public class PriorityDispatcher {
+public class PriorityDispatcher extends Thread {
 
-    private BlockingQueue<Request> requests = null;
+    private BlockingQueue<Request> requestsQueue = null;
     private BlockingQueue<Request> waitingList = null;
 
-    public PriorityDispatcher(BlockingQueue<Request> requests, BlockingQueue<Request> waitingList) {
-        this.requests = requests;
+    public PriorityDispatcher(BlockingQueue<Request> queue, BlockingQueue<Request> waitingList) {
+        this.requestsQueue = queue;
         this.waitingList = waitingList;
     }
 
-
-
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                Request r = waitingList.take();
+                if (!r.isDepending() || (!requestsQueue.contains(r) && !waitingList.contains(r))) {
+                    requestsQueue.add(r);
+                    waitingList.remove(r);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
