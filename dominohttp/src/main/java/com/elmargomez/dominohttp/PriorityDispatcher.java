@@ -16,14 +16,12 @@
 
 package com.elmargomez.dominohttp;
 
-import java.util.concurrent.BlockingQueue;
-
 public class PriorityDispatcher extends Thread {
 
-    private BlockingQueue<Request> requestsQueue = null;
-    private BlockingQueue<Request> waitingList = null;
+    private RequestOrder requestsQueue = null;
+    private RequestOrder waitingList = null;
 
-    public PriorityDispatcher(BlockingQueue<Request> queue, BlockingQueue<Request> waitingList) {
+    public PriorityDispatcher(RequestOrder queue, RequestOrder waitingList) {
         this.requestsQueue = queue;
         this.waitingList = waitingList;
     }

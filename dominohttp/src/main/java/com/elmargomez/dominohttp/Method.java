@@ -16,26 +16,10 @@
 
 package com.elmargomez.dominohttp;
 
-public class RequestQueue {
-    private static final int MIN_REQUEST_DISPATCHER_COUNT = 3;
+public class Method {
 
-    private RequestOrder requests = null;
-    private RequestOrder waitingList = null;
-
-    public void add(Request request) {
-        waitingList.add(request);
-    }
-
-    public void remove(Request request) {
-
-    }
-
-    public void start() {
-
-    }
-
-    public void stop() {
-
-    }
+    public static final String GET = "GET";
+    public static final String PUT = "PUT";
+    public static final String POST = "POST";
 
 }

@@ -18,23 +18,35 @@ package com.elmargomez.dominohttp;
 
 public class Request {
 
-    private Request request;
-    private String contentType = ContentType.APPLICATION_JSON;
+    private Dependent dependency = null;
+    private String contentType = null;
+    private String url = null;
 
-    public void setContentType(String string) {
+    public Request() {
+        this.contentType = ContentType.APPLICATION_JSON;
+    }
+
+    public Request setContentType(String string) {
         this.contentType = string;
+        return this;
     }
 
-    public Request getDependency() {
-        return request;
+    public Request setURL(String url) {
+        this.url = url;
+        return this;
     }
 
-    public void dependsOn(Request request) {
-        this.request = request;
+    public Request dependsOn(Dependent dependent) {
+        this.dependency = dependent;
+        return this;
     }
 
     public boolean isDepending() {
-        return request != null;
+        return dependency != null;
+    }
+
+    public Dependent getDependency() {
+        return dependency;
     }
 
 }

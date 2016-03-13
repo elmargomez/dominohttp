@@ -16,26 +16,21 @@
 
 package com.elmargomez.dominohttp;
 
-public class RequestQueue {
-    private static final int MIN_REQUEST_DISPATCHER_COUNT = 3;
+import java.util.concurrent.PriorityBlockingQueue;
 
-    private RequestOrder requests = null;
-    private RequestOrder waitingList = null;
+public class RequestOrder extends PriorityBlockingQueue<Request> {
 
-    public void add(Request request) {
-        waitingList.add(request);
-    }
-
-    public void remove(Request request) {
-
-    }
-
-    public void start() {
-
-    }
-
-    public void stop() {
-
+    public boolean exists(Request request) {
+        Dependent dependent = request.getDependency();
+        if (dependent != null) {
+            Object[] queue = toArray();
+            for (Object obj : queue) {
+                Request qRequest = (Request) obj;
+                if (dependent.depends(qRequest))
+                    return true;
+            }
+        }
+        return false;
     }
 
 }
