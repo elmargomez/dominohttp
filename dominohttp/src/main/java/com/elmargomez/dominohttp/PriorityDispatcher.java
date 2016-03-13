@@ -18,6 +18,7 @@ package com.elmargomez.dominohttp;
 
 public class PriorityDispatcher extends Thread {
 
+    private boolean shouldStop;
     private RequestOrder requestsQueue = null;
     private RequestOrder waitingList = null;
 
@@ -38,8 +39,15 @@ public class PriorityDispatcher extends Thread {
                     waitingList.remove(r);
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                if (shouldStop)
+                    return;
+                continue;
             }
         }
+    }
+
+    public void close() {
+        shouldStop = true;
+        interrupt();
     }
 }

@@ -18,8 +18,16 @@ package com.elmargomez.dominohttp;
 
 public class RequestDispatcher extends Thread {
 
+    private boolean shouldStop;
+
     @Override
     public void run() {
 
+    }
+
+
+    public void close() {
+        shouldStop = true;
+        interrupt();
     }
 }

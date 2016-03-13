@@ -19,8 +19,20 @@ package com.elmargomez.dominohttp;
 public class RequestQueue {
     private static final int MIN_REQUEST_DISPATCHER_COUNT = 3;
 
+    private boolean isRunning;
+    private RequestDispatcher[] dispatchers;
+    private PriorityDispatcher priorityDispatcher;
+
     private RequestOrder requests = null;
     private RequestOrder waitingList = null;
+
+    public RequestQueue(int dispatcherCount) {
+        this.dispatchers = new RequestDispatcher[dispatcherCount];
+    }
+
+    public RequestQueue() {
+        this(MIN_REQUEST_DISPATCHER_COUNT);
+    }
 
     public void add(Request request) {
         waitingList.add(request);
@@ -31,11 +43,29 @@ public class RequestQueue {
     }
 
     public void start() {
+        if (isRunning)
+            return;
 
+        isRunning = true;
+        int c = dispatchers.length;
+        for (int i = 0; i < c; i++) {
+            dispatchers[i] = new RequestDispatcher();
+            dispatchers[i].start();
+        }
+        priorityDispatcher = new PriorityDispatcher(requests, waitingList);
+        priorityDispatcher.start();
     }
 
     public void stop() {
+        if (!isRunning)
+            return;
 
+        isRunning = false;
+        int c = dispatchers.length;
+        for (int i = 0; i < c; i++) {
+            dispatchers[i].close();
+        }
+        priorityDispatcher.close();
     }
 
 }
