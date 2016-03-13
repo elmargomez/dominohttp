@@ -20,6 +20,7 @@ public class Request {
 
     private Dependent dependency = null;
     private String contentType = null;
+    private String method = null;
     private String url = null;
 
     public Request() {
@@ -28,6 +29,11 @@ public class Request {
 
     public Request setContentType(String string) {
         this.contentType = string;
+        return this;
+    }
+
+    public Request setMethod(String method) {
+        this.method = method;
         return this;
     }
 

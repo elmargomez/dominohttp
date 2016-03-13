@@ -31,7 +31,9 @@ public class PriorityDispatcher extends Thread {
         while (true) {
             try {
                 Request r = waitingList.take();
-                if (!r.isDepending() || (!requestsQueue.contains(r) && !waitingList.contains(r))) {
+                if (!r.isDepending() || (!requestsQueue.hasDependent(r)
+                        && !waitingList.hasDependent(r))) {
+
                     requestsQueue.add(r);
                     waitingList.remove(r);
                 }
