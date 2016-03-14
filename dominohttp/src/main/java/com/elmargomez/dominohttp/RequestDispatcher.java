@@ -19,12 +19,16 @@ package com.elmargomez.dominohttp;
 public class RequestDispatcher extends Thread {
 
     private boolean shouldStop;
+    private RequestOrder requestOrder;
+
+    public RequestDispatcher(RequestOrder order){
+        this.requestOrder = order;
+    }
 
     @Override
     public void run() {
 
     }
-
 
     public void close() {
         shouldStop = true;

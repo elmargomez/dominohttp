@@ -18,6 +18,9 @@ package com.elmargomez.dominohttp;
 
 public class Request {
 
+    private Request dependentObject;
+    private int retryCount = -1;
+    private int failureCount = 0;
     private Dependent dependency = null;
     private String contentType = null;
     private String method = null;
@@ -34,6 +37,11 @@ public class Request {
 
     public Request setMethod(String method) {
         this.method = method;
+        return this;
+    }
+
+    public Request setRetryCount(int c) {
+        this.retryCount = c;
         return this;
     }
 

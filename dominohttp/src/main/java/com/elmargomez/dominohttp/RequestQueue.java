@@ -49,7 +49,7 @@ public class RequestQueue {
         isRunning = true;
         int c = dispatchers.length;
         for (int i = 0; i < c; i++) {
-            dispatchers[i] = new RequestDispatcher();
+            dispatchers[i] = new RequestDispatcher(requests);
             dispatchers[i].start();
         }
         priorityDispatcher = new PriorityDispatcher(requests, waitingList);
