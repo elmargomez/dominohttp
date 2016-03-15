@@ -21,13 +21,18 @@ public class RequestDispatcher extends Thread {
     private boolean shouldStop;
     private RequestOrder requestOrder;
 
-    public RequestDispatcher(RequestOrder order){
+    public RequestDispatcher(RequestOrder order) {
         this.requestOrder = order;
     }
 
     @Override
     public void run() {
+        try {
+            Request request = requestOrder.take();
 
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void close() {

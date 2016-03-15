@@ -16,18 +16,31 @@
 
 package com.elmargomez.dominohttp;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 public class Request {
 
-    private Request dependentObject;
-    private int retryCount = -1;
-    private int failureCount = 0;
-    private Dependent dependency = null;
+    private ArrayList<Request> dependent;
+    private HashMap<String, String> header;
+
+    private int retryCount;
+    private int failureCount;
     private String contentType = null;
     private String method = null;
-    private String url = null;
+    private String stringURL = null;
 
     public Request() {
+        this.dependent = new ArrayList<>();
+        this.header = new HashMap<>();
         this.contentType = ContentType.APPLICATION_JSON;
+        this.retryCount = -1;
     }
 
     public Request setContentType(String string) {
@@ -46,21 +59,43 @@ public class Request {
     }
 
     public Request setURL(String url) {
-        this.url = url;
+        this.stringURL = url;
         return this;
     }
 
-    public Request dependsOn(Dependent dependent) {
-        this.dependency = dependent;
+    public Request addDependant(Request dependentR) {
+        if (dependent == null)
+            dependent = new ArrayList<>();
+
+        dependent.add(dependentR);
         return this;
     }
 
-    public boolean isDepending() {
-        return dependency != null;
+    public Request addHeader(String key, String val) {
+        header.put(key, val);
+        return this;
     }
 
-    public Dependent getDependency() {
-        return dependency;
+    public ArrayList<Request> getDependentRequests() {
+        return dependent;
+    }
+
+    public void execute() {
+        try {
+            URL url = new URL(stringURL);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod(method);
+            connection.setRequestProperty("Content-Type", contentType);
+            Set<Map.Entry<String, String>> entries = header.entrySet();
+            for (Map.Entry<String, String> entry : entries) {
+                connection.setRequestProperty(entry.getKey(), entry.getValue());
+            }
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

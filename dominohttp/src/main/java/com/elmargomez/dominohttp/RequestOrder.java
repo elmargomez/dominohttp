@@ -20,17 +20,5 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 public class RequestOrder extends PriorityBlockingQueue<Request> {
 
-    public boolean hasDependent(Request request) {
-        Dependent dependent = request.getDependency();
-        if (dependent != null) {
-            Object[] queue = toArray();
-            for (Object obj : queue) {
-                Request qRequest = (Request) obj;
-                if (dependent.depends(qRequest))
-                    return true;
-            }
-        }
-        return false;
-    }
 
 }

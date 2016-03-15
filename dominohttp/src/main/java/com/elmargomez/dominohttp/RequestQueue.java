@@ -21,12 +21,10 @@ public class RequestQueue {
 
     private boolean isRunning;
     private RequestDispatcher[] dispatchers;
-    private PriorityDispatcher priorityDispatcher;
-
-    private RequestOrder requests = null;
-    private RequestOrder waitingList = null;
+    private RequestOrder requestsQueue = null;
 
     public RequestQueue(int dispatcherCount) {
+        requestsQueue = new RequestOrder();
         this.dispatchers = new RequestDispatcher[dispatcherCount];
     }
 
@@ -35,7 +33,7 @@ public class RequestQueue {
     }
 
     public void add(Request request) {
-        waitingList.add(request);
+        requestsQueue.add(request);
     }
 
     public void remove(Request request) {
@@ -49,11 +47,9 @@ public class RequestQueue {
         isRunning = true;
         int c = dispatchers.length;
         for (int i = 0; i < c; i++) {
-            dispatchers[i] = new RequestDispatcher(requests);
+            dispatchers[i] = new RequestDispatcher(requestsQueue);
             dispatchers[i].start();
         }
-        priorityDispatcher = new PriorityDispatcher(requests, waitingList);
-        priorityDispatcher.start();
     }
 
     public void stop() {
@@ -65,7 +61,6 @@ public class RequestQueue {
         for (int i = 0; i < c; i++) {
             dispatchers[i].close();
         }
-        priorityDispatcher.close();
     }
 
 }
