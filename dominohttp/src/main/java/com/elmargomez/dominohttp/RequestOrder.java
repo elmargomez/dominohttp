@@ -16,6 +16,8 @@
 
 package com.elmargomez.dominohttp;
 
+import com.elmargomez.dominohttp.request.Request;
+
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class RequestOrder extends PriorityBlockingQueue<Request> {

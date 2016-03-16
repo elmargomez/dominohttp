@@ -14,27 +14,24 @@
  * limitations under the License.
  */
 
-package com.elmargomez.dominohttp;
+package com.elmargomez.dominohttp.request;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import com.elmargomez.dominohttp.ContentType;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
-public class Request {
+public abstract class Request {
 
-    private ArrayList<Request> dependent;
-    private HashMap<String, String> header;
+    protected ArrayList<Request> dependent;
+    protected HashMap<String, String> header;
 
-    private int retryCount;
-    private int failureCount;
-    private String contentType = null;
-    private String method = null;
-    private String stringURL = null;
+    protected RequestFailed failedListener;
+    protected int retryCount;
+    protected int failureCount;
+    protected String contentType = null;
+    protected String method = null;
+    protected String stringURL = null;
 
     public Request() {
         this.dependent = new ArrayList<>();
@@ -80,22 +77,30 @@ public class Request {
         return dependent;
     }
 
-    public void execute() {
-        try {
-            URL url = new URL(stringURL);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod(method);
-            connection.setRequestProperty("Content-Type", contentType);
-            Set<Map.Entry<String, String>> entries = header.entrySet();
-            for (Map.Entry<String, String> entry : entries) {
-                connection.setRequestProperty(entry.getKey(), entry.getValue());
-            }
+    public void setFailedListener(RequestFailed f) {
+        this.failedListener = f;
+    }
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public abstract void execute();
+
+    /**
+     * Request Success Listener
+     *
+     * @param <T>
+     */
+    interface RequestSuccess<T> {
+
+        void response(T t);
+
+    }
+
+    /**
+     * Request Failure Listener
+     */
+    interface RequestFailed {
+
+        void response(String error);
+
     }
 
 }

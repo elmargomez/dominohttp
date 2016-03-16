@@ -16,6 +16,8 @@
 
 package com.elmargomez.dominohttp;
 
+import com.elmargomez.dominohttp.request.Request;
+
 public class RequestQueue {
     private static final int MIN_REQUEST_DISPATCHER_COUNT = 3;
 

@@ -16,6 +16,8 @@
 
 package com.elmargomez.dominohttp;
 
+import com.elmargomez.dominohttp.request.Request;
+
 public class RequestDispatcher extends Thread {
 
     private boolean shouldStop;
