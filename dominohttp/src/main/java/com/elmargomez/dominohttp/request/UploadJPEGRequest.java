@@ -19,14 +19,12 @@ package com.elmargomez.dominohttp.request;
 import com.elmargomez.dominohttp.ContentType;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -35,19 +33,21 @@ import java.util.Set;
 
 public class UploadJPEGRequest extends Request {
 
-    protected RequestSuccess<String> successListener;
+    protected OnSuccessListener<String> successListener;
     private String imagePath;
 
     public UploadJPEGRequest() {
         setContentType(ContentType.IMAGE_JPEG);
     }
 
-    public void setImagePath(String s) {
+    public UploadJPEGRequest setImagePath(String s) {
         imagePath = s;
+        return this;
     }
 
-    public void setSuccessListener(RequestSuccess<String> success) {
+    public UploadJPEGRequest setSuccessListener(OnSuccessListener<String> success) {
         this.successListener = success;
+        return this;
     }
 
     public void execute() {
@@ -70,9 +70,11 @@ public class UploadJPEGRequest extends Request {
             byte[] buff = new byte[1024];
             int count;
             while (-1 != (count = fileInputStream.read(buff))) {
-
+                outputStream.write(buff, 0, count);
             }
-
+            outputStream.flush();
+            outputStream.close();
+            
             int respondCode = connection.getResponseCode();
             if (200 == respondCode) {
                 if (successListener != null) {
@@ -87,18 +89,29 @@ public class UploadJPEGRequest extends Request {
                     successListener.response(builder.toString());
                 }
             } else {
-                if (failedListener != null) {
-                    failedListener.response("Response code " + respondCode + "!");
+                OnRequestFailedListener listener = getRequestFailedListener();
+                if (listener != null) {
+                    InputStream inputStream = connection.getErrorStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder builder = new StringBuilder();
+                    String temp;
+                    while ((temp = reader.readLine()) != null) {
+                        builder.append(temp);
+                    }
+                    reader.close();
+                    listener.response(inputStream.toString(), connection.getResponseCode());
                 }
             }
 
         } catch (MalformedURLException e) {
-            if (failedListener != null) {
-                failedListener.response("MalformedURLException :" + e.getMessage());
+            OnInternalFailedListener listener = getInternalFailedListener();
+            if (listener != null) {
+                listener.response("MalformedURLException :" + e.getMessage());
             }
         } catch (IOException e) {
-            if (failedListener != null) {
-                failedListener.response("IOException :" + e.getMessage());
+            OnInternalFailedListener listener = getInternalFailedListener();
+            if (listener != null) {
+                listener.response("IOException :" + e.getMessage());
             }
         }
     }

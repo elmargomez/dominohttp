@@ -31,7 +31,11 @@ public class RequestDispatcher extends Thread {
     public void run() {
         try {
             Request request = requestOrder.take();
+            String contentProv = request.getContentType();
+            switch (contentProv){
+                case ContentType.APPLICATION_JSON:
 
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

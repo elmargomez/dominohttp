@@ -36,7 +36,7 @@ import java.util.Set;
 
 public class JSONObjectRequest extends Request {
 
-    protected RequestSuccess<JSONObject> successListener;
+    protected OnSuccessListener<JSONObject> successListener;
     private String jsonBody;
 
     public JSONObjectRequest() {
@@ -47,7 +47,7 @@ public class JSONObjectRequest extends Request {
         jsonBody = s;
     }
 
-    public void setSuccessListener(RequestSuccess<JSONObject> success) {
+    public void setSuccessListener(OnSuccessListener<JSONObject> success) {
         this.successListener = success;
     }
 
@@ -64,8 +64,8 @@ public class JSONObjectRequest extends Request {
 
             if (jsonBody != null) {
                 OutputStream outputStream = connection.getOutputStream();
-                BufferedWriter writer =
-                        new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream,
+                        "UTF-8"));
                 writer.write(jsonBody);
                 writer.flush();
                 writer.close();
@@ -86,24 +86,36 @@ public class JSONObjectRequest extends Request {
                         JSONObject object = new JSONObject(builder.toString());
                         successListener.response(object);
                     } catch (JSONException e) {
-                        if (failedListener != null) {
-                            failedListener.response("JSONException :" + e.getMessage());
+                        OnInternalFailedListener listener = getInternalFailedListener();
+                        if (listener != null) {
+                            listener.response("JSONException :" + e.getMessage());
                         }
                     }
                 }
             } else {
-                if (failedListener != null) {
-                    failedListener.response("Response code " + respondCode + "!");
+                OnRequestFailedListener listener = getRequestFailedListener();
+                if (listener != null) {
+                    InputStream inputStream = connection.getErrorStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder builder = new StringBuilder();
+                    String temp;
+                    while ((temp = reader.readLine()) != null) {
+                        builder.append(temp);
+                    }
+                    reader.close();
+                    listener.response(inputStream.toString(), connection.getResponseCode());
                 }
             }
 
         } catch (MalformedURLException e) {
-            if (failedListener != null) {
-                failedListener.response("MalformedURLException :"+e.getMessage());
+            OnInternalFailedListener listener = getInternalFailedListener();
+            if (listener != null) {
+                listener.response("MalformedURLException :" + e.getMessage());
             }
         } catch (IOException e) {
-            if (failedListener != null) {
-                failedListener.response("IOException :"+e.getMessage());
+            OnInternalFailedListener listener = getInternalFailedListener();
+            if (listener != null) {
+                listener.response("IOException :" + e.getMessage());
             }
         }
     }

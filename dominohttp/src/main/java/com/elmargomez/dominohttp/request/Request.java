@@ -18,6 +18,7 @@ package com.elmargomez.dominohttp.request;
 
 import com.elmargomez.dominohttp.ContentType;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -26,7 +27,10 @@ public abstract class Request {
     protected ArrayList<Request> dependent;
     protected HashMap<String, String> header;
 
-    protected RequestFailed failedListener;
+    // the listener for our request.
+    private OnInternalFailedListener internalFailedListener;
+    private OnRequestFailedListener requestFailedListener;
+
     protected int retryCount;
     protected int failureCount;
     protected String contentType = null;
@@ -43,6 +47,10 @@ public abstract class Request {
     public Request setContentType(String string) {
         this.contentType = string;
         return this;
+    }
+
+    public String getContentType() {
+        return contentType;
     }
 
     public Request setMethod(String method) {
@@ -77,8 +85,20 @@ public abstract class Request {
         return dependent;
     }
 
-    public void setFailedListener(RequestFailed f) {
-        this.failedListener = f;
+    public void setOnInternalFailedListener(OnInternalFailedListener f) {
+        this.internalFailedListener = f;
+    }
+
+    public OnInternalFailedListener getInternalFailedListener() {
+        return internalFailedListener;
+    }
+
+    public void setOnRequestFailedListener(OnRequestFailedListener f) {
+        this.requestFailedListener = f;
+    }
+
+    public OnRequestFailedListener getRequestFailedListener() {
+        return requestFailedListener;
     }
 
     public abstract void execute();
@@ -88,18 +108,24 @@ public abstract class Request {
      *
      * @param <T>
      */
-    interface RequestSuccess<T> {
+    interface OnSuccessListener<T> {
 
         void response(T t);
 
     }
 
     /**
-     * Request Failure Listener
+     * A Failure Listener
      */
-    interface RequestFailed {
+    interface OnInternalFailedListener {
 
         void response(String error);
+
+    }
+
+    interface OnRequestFailedListener {
+
+        void response(String response, int statusCode);
 
     }
 

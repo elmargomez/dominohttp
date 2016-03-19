@@ -20,7 +20,6 @@ import com.elmargomez.dominohttp.ContentType;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -37,7 +36,7 @@ import java.util.Set;
 
 public class JSONArrayRequest extends Request {
 
-    protected RequestSuccess<JSONArray> successListener;
+    protected OnSuccessListener<JSONArray> successListener;
     private String jsonBody;
 
     public JSONArrayRequest() {
@@ -48,7 +47,7 @@ public class JSONArrayRequest extends Request {
         jsonBody = s;
     }
 
-    public void setSuccessListener(RequestSuccess<JSONArray> success) {
+    public void setSuccessListener(OnSuccessListener<JSONArray> success) {
         this.successListener = success;
     }
 
@@ -87,24 +86,36 @@ public class JSONArrayRequest extends Request {
                         JSONArray object = new JSONArray(builder.toString());
                         successListener.response(object);
                     } catch (JSONException e) {
-                        if (failedListener != null) {
-                            failedListener.response("JSONException :" + e.getMessage());
+                        OnInternalFailedListener listener = getInternalFailedListener();
+                        if (listener != null) {
+                            listener.response("JSONException :" + e.getMessage());
                         }
                     }
                 }
             } else {
-                if (failedListener != null) {
-                    failedListener.response("Response code " + respondCode + "!");
+                OnRequestFailedListener listener = getRequestFailedListener();
+                if (listener != null) {
+                    InputStream inputStream = connection.getErrorStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder builder = new StringBuilder();
+                    String temp;
+                    while ((temp = reader.readLine()) != null) {
+                        builder.append(temp);
+                    }
+                    reader.close();
+                    listener.response(inputStream.toString(), connection.getResponseCode());
                 }
             }
 
         } catch (MalformedURLException e) {
-            if (failedListener != null) {
-                failedListener.response("MalformedURLException :"+e.getMessage());
+            OnInternalFailedListener listener = getInternalFailedListener();
+            if (listener != null) {
+                listener.response("MalformedURLException :" + e.getMessage());
             }
         } catch (IOException e) {
-            if (failedListener != null) {
-                failedListener.response("IOException :"+e.getMessage());
+            OnInternalFailedListener listener = getInternalFailedListener();
+            if (listener != null) {
+                listener.response("IOException :" + e.getMessage());
             }
         }
     }
