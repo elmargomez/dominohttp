@@ -30,9 +30,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Map;
-import java.util.Set;
 
 public class JSONObjectRequest extends Request {
 
@@ -53,14 +50,7 @@ public class JSONObjectRequest extends Request {
 
     public void execute() {
         try {
-            URL url = new URL(stringURL);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod(method);
-            connection.setRequestProperty("Content-Type", contentType);
-            Set<Map.Entry<String, String>> entries = header.entrySet();
-            for (Map.Entry<String, String> entry : entries) {
-                connection.setRequestProperty(entry.getKey(), entry.getValue());
-            }
+            HttpURLConnection connection = getConnection();
 
             if (jsonBody != null) {
                 OutputStream outputStream = connection.getOutputStream();
@@ -103,7 +93,7 @@ public class JSONObjectRequest extends Request {
                         builder.append(temp);
                     }
                     reader.close();
-                    listener.response(inputStream.toString(), connection.getResponseCode());
+                    listener.response(builder.toString(), connection.getResponseCode());
                 }
             }
 

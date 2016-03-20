@@ -18,11 +18,15 @@ package com.elmargomez.dominohttp.request;
 
 import com.elmargomez.dominohttp.ContentType;
 
-import java.io.InputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
-public abstract class Request {
+public abstract class Request<T> {
 
     protected ArrayList<Request> dependent;
     protected HashMap<String, String> header;
@@ -33,9 +37,9 @@ public abstract class Request {
 
     protected int retryCount;
     protected int failureCount;
-    protected String contentType = null;
-    protected String method = null;
-    protected String stringURL = null;
+    private String contentType = null;
+    private String method = null;
+    private String stringURL = null;
 
     public Request() {
         this.dependent = new ArrayList<>();
@@ -44,41 +48,41 @@ public abstract class Request {
         this.retryCount = -1;
     }
 
-    public Request setContentType(String string) {
+    public T setContentType(String string) {
         this.contentType = string;
-        return this;
+        return (T) this;
     }
 
     public String getContentType() {
         return contentType;
     }
 
-    public Request setMethod(String method) {
+    public T setMethod(String method) {
         this.method = method;
-        return this;
+        return (T) this;
     }
 
-    public Request setRetryCount(int c) {
+    public T setRetryCount(int c) {
         this.retryCount = c;
-        return this;
+        return (T) this;
     }
 
-    public Request setURL(String url) {
+    public T setURL(String url) {
         this.stringURL = url;
-        return this;
+        return (T) this;
     }
 
-    public Request addDependant(Request dependentR) {
+    public T addDependant(Request dependentR) {
         if (dependent == null)
             dependent = new ArrayList<>();
 
         dependent.add(dependentR);
-        return this;
+        return (T) this;
     }
 
-    public Request addHeader(String key, String val) {
+    public T addHeader(String key, String val) {
         header.put(key, val);
-        return this;
+        return (T) this;
     }
 
     public ArrayList<Request> getDependentRequests() {
@@ -102,6 +106,28 @@ public abstract class Request {
     }
 
     public abstract void execute();
+
+    public HttpURLConnection getConnection() throws IOException {
+        if (stringURL == null)
+            throw new NullPointerException("URL is null.");
+
+        if (method == null)
+            throw new NullPointerException("Method is null, please add method e.g POST.");
+
+        if (contentType == null)
+            throw new NullPointerException("Content Type is null, please add Content-Type " +
+                    "e.g. application/json");
+
+        URL url = new URL(stringURL);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod(method);
+        connection.setRequestProperty("Content-Type", contentType);
+        Set<Map.Entry<String, String>> entries = header.entrySet();
+        for (Map.Entry<String, String> entry : entries) {
+            connection.setRequestProperty(entry.getKey(), entry.getValue());
+        }
+        return connection;
+    }
 
     /**
      * Request Success Listener

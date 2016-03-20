@@ -27,11 +27,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Map;
-import java.util.Set;
 
-public class UploadJPEGRequest extends Request {
+public class UploadJPEGRequest extends Request<UploadJPEGRequest> {
 
     protected OnSuccessListener<String> successListener;
     private String imagePath;
@@ -40,7 +37,7 @@ public class UploadJPEGRequest extends Request {
         setContentType(ContentType.IMAGE_JPEG);
     }
 
-    public UploadJPEGRequest setImagePath(String s) {
+    public UploadJPEGRequest setURI(String s) {
         imagePath = s;
         return this;
     }
@@ -52,14 +49,7 @@ public class UploadJPEGRequest extends Request {
 
     public void execute() {
         try {
-            URL url = new URL(stringURL);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod(method);
-            connection.setRequestProperty("Content-Type", contentType);
-            Set<Map.Entry<String, String>> entries = header.entrySet();
-            for (Map.Entry<String, String> entry : entries) {
-                connection.setRequestProperty(entry.getKey(), entry.getValue());
-            }
+            HttpURLConnection connection = getConnection();
 
             if (imagePath == null)
                 throw new NullPointerException("Image Path is null!");
@@ -99,7 +89,7 @@ public class UploadJPEGRequest extends Request {
                         builder.append(temp);
                     }
                     reader.close();
-                    listener.response(inputStream.toString(), connection.getResponseCode());
+                    listener.response(builder.toString(), connection.getResponseCode());
                 }
             }
 
