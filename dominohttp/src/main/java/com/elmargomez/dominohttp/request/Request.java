@@ -36,7 +36,6 @@ public abstract class Request<T> {
     private OnRequestFailedListener requestFailedListener;
 
     protected int retryCount;
-    protected int failureCount;
     private String contentType = null;
     private String method = null;
     private String stringURL = null;
@@ -65,6 +64,19 @@ public abstract class Request<T> {
     public T setRetryCount(int c) {
         this.retryCount = c;
         return (T) this;
+    }
+
+    public void decrimentRetryLeft() {
+        if (retryCount == -1)
+            return;
+
+        retryCount--;
+    }
+
+    public boolean canRetry() {
+        if (retryCount == -1)
+            return true;
+        return (retryCount != 0);
     }
 
     public T setURL(String url) {
@@ -105,7 +117,7 @@ public abstract class Request<T> {
         return requestFailedListener;
     }
 
-    public abstract void execute();
+    public abstract boolean executed();
 
     public HttpURLConnection getConnection() throws IOException {
         if (stringURL == null)

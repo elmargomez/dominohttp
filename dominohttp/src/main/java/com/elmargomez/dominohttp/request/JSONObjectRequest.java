@@ -48,7 +48,7 @@ public class JSONObjectRequest extends Request {
         this.successListener = success;
     }
 
-    public void execute() {
+    public void executed() {
         try {
             HttpURLConnection connection = getConnection();
 

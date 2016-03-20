@@ -29,11 +29,20 @@ public class RequestDispatcher extends Thread {
 
     @Override
     public void run() {
-        try {
-            Request request = requestOrder.take();
-            request.execute();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        while (true) {
+            try {
+                Request request = requestOrder.take();
+                if (!request.executed()) {
+                    if (request.canRetry()) {
+                        request.decrimentRetryLeft();
+                        requestOrder.add(request);
+                    }
+                }
+            } catch (InterruptedException e) {
+                if (shouldStop) {
+                    return;
+                }
+            }
         }
     }
 
