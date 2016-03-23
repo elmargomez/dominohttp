@@ -48,7 +48,7 @@ public class JSONArrayRequest extends Request {
         this.successListener = success;
     }
 
-    public void executed() {
+    public int executed() {
         try {
             HttpURLConnection connection = getConnection();
 
@@ -82,6 +82,7 @@ public class JSONArrayRequest extends Request {
                         }
                     }
                 }
+                return EXECUTION_REQUEST_SUCCESS;
             } else {
                 OnRequestFailedListener listener = getRequestFailedListener();
                 if (listener != null) {
@@ -95,6 +96,7 @@ public class JSONArrayRequest extends Request {
                     reader.close();
                     listener.response(builder.toString(), connection.getResponseCode());
                 }
+                return EXECUTION_REQUEST_FAILED;
             }
 
         } catch (MalformedURLException e) {
@@ -108,6 +110,7 @@ public class JSONArrayRequest extends Request {
                 listener.response("IOException :" + e.getMessage());
             }
         }
+        return EXECUTION_ERROR_ON_DEPLOY;
     }
 
 
