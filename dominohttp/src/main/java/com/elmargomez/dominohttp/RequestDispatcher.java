@@ -32,11 +32,18 @@ public class RequestDispatcher extends Thread {
         while (true) {
             try {
                 Request request = requestOrder.take();
-                if (!request.executed()) {
-                    if (request.canRetry()) {
-                        request.decrimentRetryLeft();
-                        requestOrder.add(request);
-                    }
+                int req = request.executed();
+                switch (req) {
+                    case Request.EXECUTION_REQUEST_SUCCESS:
+                        requestOrder.addAll(request.getDependentRequests());
+                        break;
+                    case Request.EXECUTION_REQUEST_FAILED:
+                    case Request.EXECUTION_ERROR_ON_DEPLOY:
+                        if (request.canRetry()) {
+                            request.decrimentRetryLeft();
+                            requestOrder.add(request);
+                        }
+                        break;
                 }
             } catch (InterruptedException e) {
                 if (shouldStop) {

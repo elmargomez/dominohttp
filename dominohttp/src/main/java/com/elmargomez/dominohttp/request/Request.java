@@ -28,6 +28,11 @@ import java.util.Set;
 
 public abstract class Request<T> {
 
+    public static final int EXECUTION_REQUEST_SUCCESS = 0;
+    public static final int EXECUTION_REQUEST_FAILED = 1;
+    public static final int EXECUTION_ERROR_ON_DEPLOY = 2;
+
+
     private ArrayList<Request> dependent;
     private HashMap<String, String> header;
 
@@ -85,9 +90,6 @@ public abstract class Request<T> {
     }
 
     public T addDependant(Request dependentR) {
-        if (dependent == null)
-            dependent = new ArrayList<>();
-
         dependent.add(dependentR);
         return (T) this;
     }
@@ -117,8 +119,6 @@ public abstract class Request<T> {
         return requestFailedListener;
     }
 
-    public abstract boolean executed();
-
     public HttpURLConnection getConnection() throws IOException {
         if (stringURL == null)
             throw new NullPointerException("URL is null.");
@@ -140,6 +140,8 @@ public abstract class Request<T> {
         }
         return connection;
     }
+
+    public abstract int executed();
 
     /**
      * Request Success Listener

@@ -47,7 +47,7 @@ public class UploadJPEGRequest extends Request<UploadJPEGRequest> {
         return this;
     }
 
-    public boolean executed() {
+    public int executed() {
         try {
             HttpURLConnection connection = getConnection();
 
@@ -78,6 +78,7 @@ public class UploadJPEGRequest extends Request<UploadJPEGRequest> {
                     reader.close();
                     successListener.response(builder.toString());
                 }
+                return EXECUTION_REQUEST_SUCCESS;
             } else {
                 OnRequestFailedListener listener = getRequestFailedListener();
                 if (listener != null) {
@@ -91,7 +92,7 @@ public class UploadJPEGRequest extends Request<UploadJPEGRequest> {
                     reader.close();
                     listener.response(builder.toString(), connection.getResponseCode());
                 }
-                return false;
+                return EXECUTION_REQUEST_FAILED;
             }
 
         } catch (MalformedURLException e) {
@@ -105,7 +106,7 @@ public class UploadJPEGRequest extends Request<UploadJPEGRequest> {
                 listener.response("IOException :" + e.getMessage());
             }
         }
-        return true;
+        return EXECUTION_ERROR_ON_DEPLOY;
     }
 
 
