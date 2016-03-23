@@ -28,14 +28,14 @@ import java.util.Set;
 
 public abstract class Request<T> {
 
-    protected ArrayList<Request> dependent;
-    protected HashMap<String, String> header;
+    private ArrayList<Request> dependent;
+    private HashMap<String, String> header;
 
     // the listener for our request.
     private OnInternalFailedListener internalFailedListener;
     private OnRequestFailedListener requestFailedListener;
 
-    protected int retryCount;
+    private int retryCount;
     private String contentType = null;
     private String method = null;
     private String stringURL = null;
