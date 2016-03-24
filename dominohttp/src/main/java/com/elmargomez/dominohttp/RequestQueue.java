@@ -18,15 +18,17 @@ package com.elmargomez.dominohttp;
 
 import com.elmargomez.dominohttp.request.Request;
 
+import java.util.concurrent.PriorityBlockingQueue;
+
 public class RequestQueue {
     private static final int MIN_REQUEST_DISPATCHER_COUNT = 3;
 
     private boolean isRunning;
     private RequestDispatcher[] dispatchers;
-    private RequestOrder requestsQueue = null;
+    private PriorityBlockingQueue<Request> requestsQueue = null;
 
     public RequestQueue(int dispatcherCount) {
-        requestsQueue = new RequestOrder();
+        requestsQueue = new PriorityBlockingQueue();
         this.dispatchers = new RequestDispatcher[dispatcherCount];
     }
 

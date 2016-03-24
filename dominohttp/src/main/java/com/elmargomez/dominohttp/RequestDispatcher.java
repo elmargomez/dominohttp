@@ -18,12 +18,14 @@ package com.elmargomez.dominohttp;
 
 import com.elmargomez.dominohttp.request.Request;
 
+import java.util.concurrent.PriorityBlockingQueue;
+
 public class RequestDispatcher extends Thread {
 
     private boolean shouldStop;
-    private RequestOrder requestOrder;
+    private PriorityBlockingQueue<Request> requestOrder;
 
-    public RequestDispatcher(RequestOrder order) {
+    public RequestDispatcher(PriorityBlockingQueue order) {
         this.requestOrder = order;
     }
 
