@@ -35,17 +35,27 @@ public class RequestDispatcher extends Thread {
                 int req = request.executed();
                 switch (req) {
                     case Request.EXECUTION_REQUEST_SUCCESS:
+                        // Since the request is successful, It is necessary to execute next
+                        // the descending Request.
                         requestOrder.addAll(request.getDependentRequests());
                         break;
                     case Request.EXECUTION_REQUEST_ERROR:
-
+                        // TODO add something later
                         break;
                     case Request.EXECUTION_FAILURE_ON_DEPLOY:
                         if (request.canRetry()) {
+                            // While the request fails, let us add it again to the queue
+                            // until the retry count reached to 0.
                             request.decrimentRetryLeft();
                             requestOrder.add(request);
                         } else {
-
+                            // Since the request error reached zero lets now fire the callback,
+                            // all the other descending request will be dropped.
+                            Request.OnInternalFailedListener listener =
+                                    request.getInternalFailedListener();
+                            if (listener != null) {
+                                listener.response(request.getErrorMessage());
+                            }
                         }
                         break;
                 }

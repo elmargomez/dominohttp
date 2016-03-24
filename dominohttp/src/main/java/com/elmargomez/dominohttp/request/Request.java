@@ -160,7 +160,7 @@ public abstract class Request<T> {
      *
      * @param <T>
      */
-    interface OnSuccessListener<T> {
+    public interface OnSuccessListener<T> {
 
         void response(T t);
 
@@ -169,13 +169,13 @@ public abstract class Request<T> {
     /**
      * A Failure Listener
      */
-    interface OnInternalFailedListener {
+    public interface OnInternalFailedListener {
 
         void response(String error);
 
     }
 
-    interface OnRequestFailedListener {
+    public interface OnRequestFailedListener {
 
         void response(String response, int statusCode);
 

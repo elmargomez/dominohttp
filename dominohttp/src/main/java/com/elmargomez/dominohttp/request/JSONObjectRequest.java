@@ -72,15 +72,9 @@ public class JSONObjectRequest extends Request {
                         builder.append(temp);
                     }
                     reader.close();
-                    try {
-                        JSONObject object = new JSONObject(builder.toString());
-                        successListener.response(object);
-                    } catch (JSONException e) {
-                        OnInternalFailedListener listener = getInternalFailedListener();
-                        if (listener != null) {
-                            listener.response("JSONException :" + e.getMessage());
-                        }
-                    }
+
+                    JSONObject object = new JSONObject(builder.toString());
+                    successListener.response(object);
                 }
                 return EXECUTION_REQUEST_SUCCESS;
             } else {
@@ -100,15 +94,11 @@ public class JSONObjectRequest extends Request {
             }
 
         } catch (MalformedURLException e) {
-            OnInternalFailedListener listener = getInternalFailedListener();
-            if (listener != null) {
-                listener.response("MalformedURLException :" + e.getMessage());
-            }
+            setErrorMessage("MalformedURLException :" + e.getMessage());
         } catch (IOException e) {
-            OnInternalFailedListener listener = getInternalFailedListener();
-            if (listener != null) {
-                listener.response("IOException :" + e.getMessage());
-            }
+            setErrorMessage("IOException :" + e.getMessage());
+        } catch (JSONException e) {
+            setErrorMessage("JSONException :" + e.getMessage());
         }
         return EXECUTION_FAILURE_ON_DEPLOY;
     }

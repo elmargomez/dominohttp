@@ -96,15 +96,9 @@ public class UploadJPEGRequest extends Request<UploadJPEGRequest> {
             }
 
         } catch (MalformedURLException e) {
-            OnInternalFailedListener listener = getInternalFailedListener();
-            if (listener != null) {
-                listener.response("MalformedURLException :" + e.getMessage());
-            }
+            setErrorMessage("MalformedURLException :" + e.getMessage());
         } catch (IOException e) {
-            OnInternalFailedListener listener = getInternalFailedListener();
-            if (listener != null) {
-                listener.response("IOException :" + e.getMessage());
-            }
+            setErrorMessage("IOException :" + e.getMessage());
         }
         return EXECUTION_FAILURE_ON_DEPLOY;
     }
