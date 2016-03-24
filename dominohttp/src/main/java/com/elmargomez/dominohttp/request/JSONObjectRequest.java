@@ -96,7 +96,7 @@ public class JSONObjectRequest extends Request {
                     reader.close();
                     listener.response(builder.toString(), connection.getResponseCode());
                 }
-                return EXECUTION_REQUEST_FAILED;
+                return EXECUTION_REQUEST_ERROR;
             }
 
         } catch (MalformedURLException e) {
@@ -110,7 +110,7 @@ public class JSONObjectRequest extends Request {
                 listener.response("IOException :" + e.getMessage());
             }
         }
-        return EXECUTION_ERROR_ON_DEPLOY;
+        return EXECUTION_FAILURE_ON_DEPLOY;
     }
 
 

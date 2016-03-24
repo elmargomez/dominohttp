@@ -37,11 +37,15 @@ public class RequestDispatcher extends Thread {
                     case Request.EXECUTION_REQUEST_SUCCESS:
                         requestOrder.addAll(request.getDependentRequests());
                         break;
-                    case Request.EXECUTION_REQUEST_FAILED:
-                    case Request.EXECUTION_ERROR_ON_DEPLOY:
+                    case Request.EXECUTION_REQUEST_ERROR:
+
+                        break;
+                    case Request.EXECUTION_FAILURE_ON_DEPLOY:
                         if (request.canRetry()) {
                             request.decrimentRetryLeft();
                             requestOrder.add(request);
+                        } else {
+
                         }
                         break;
                 }

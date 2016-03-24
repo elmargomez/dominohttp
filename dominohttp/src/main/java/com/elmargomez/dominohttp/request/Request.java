@@ -29,8 +29,8 @@ import java.util.Set;
 public abstract class Request<T> {
 
     public static final int EXECUTION_REQUEST_SUCCESS = 0;
-    public static final int EXECUTION_REQUEST_FAILED = 1;
-    public static final int EXECUTION_ERROR_ON_DEPLOY = 2;
+    public static final int EXECUTION_REQUEST_ERROR = 1;
+    public static final int EXECUTION_FAILURE_ON_DEPLOY = 2;
 
 
     private ArrayList<Request> dependent;
@@ -41,6 +41,7 @@ public abstract class Request<T> {
     private OnRequestFailedListener requestFailedListener;
 
     private int retryCount;
+    private String errorMessage = null;
     private String contentType = null;
     private String method = null;
     private String stringURL = null;
@@ -139,6 +140,17 @@ public abstract class Request<T> {
             connection.setRequestProperty(entry.getKey(), entry.getValue());
         }
         return connection;
+    }
+
+    public void setErrorMessage(String errorMessage){
+        this.errorMessage = errorMessage;
+    }
+
+    public String getErrorMessage(){
+        if(errorMessage == null)
+            return "";
+
+        return errorMessage;
     }
 
     public abstract int executed();

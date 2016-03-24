@@ -92,7 +92,7 @@ public class UploadJPEGRequest extends Request<UploadJPEGRequest> {
                     reader.close();
                     listener.response(builder.toString(), connection.getResponseCode());
                 }
-                return EXECUTION_REQUEST_FAILED;
+                return EXECUTION_REQUEST_ERROR;
             }
 
         } catch (MalformedURLException e) {
@@ -106,7 +106,7 @@ public class UploadJPEGRequest extends Request<UploadJPEGRequest> {
                 listener.response("IOException :" + e.getMessage());
             }
         }
-        return EXECUTION_ERROR_ON_DEPLOY;
+        return EXECUTION_FAILURE_ON_DEPLOY;
     }
 
 
