@@ -21,7 +21,7 @@ import com.elmargomez.dominohttp.request.Request;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class RequestQueue {
-    private static final int MIN_REQUEST_DISPATCHER_COUNT = 3;
+    private static final int MIN_REQUEST_DISPATCHER_COUNT = 4;
 
     private boolean isRunning;
     private RequestDispatcher[] dispatchers;
