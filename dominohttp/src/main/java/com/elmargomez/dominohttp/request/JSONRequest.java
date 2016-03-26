@@ -20,6 +20,8 @@ import com.elmargomez.dominohttp.ContentType;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -31,21 +33,37 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 
-public class JSONArrayRequest extends Request {
+public class JSONRequest extends Request<JSONRequest> {
 
-    protected OnSuccessListener<JSONArray> successListener;
+    protected OnSuccessListener<JSONObject> successListenerObject;
+    protected OnSuccessListener<JSONArray> successListenerArray;
     private String jsonBody;
 
-    public JSONArrayRequest() {
+    public JSONRequest() {
         setContentType(ContentType.APPLICATION_JSON);
     }
 
-    public void setJSONBody(String s) {
+    public JSONRequest setJSONBody(String s) {
         jsonBody = s;
+        return this;
     }
 
-    public void setSuccessListener(OnSuccessListener<JSONArray> success) {
-        this.successListener = success;
+    public JSONRequest setJSONBody(JSONObject s) {
+        return setJSONBody(s.toString());
+    }
+
+    public JSONRequest setJSONBody(JSONArray s) {
+        return setJSONBody(s.toString());
+    }
+
+    public JSONRequest setOnJSONObjectListener(OnSuccessListener<JSONObject> success) {
+        this.successListenerObject = success;
+        return this;
+    }
+
+    public JSONRequest setOnJSONArrayListener(OnSuccessListener<JSONArray> success) {
+        this.successListenerArray = success;
+        return this;
     }
 
     public int executed() {
@@ -54,8 +72,8 @@ public class JSONArrayRequest extends Request {
 
             if (jsonBody != null) {
                 OutputStream outputStream = connection.getOutputStream();
-                BufferedWriter writer =
-                        new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream,
+                        "UTF-8"));
                 writer.write(jsonBody);
                 writer.flush();
                 writer.close();
@@ -63,19 +81,25 @@ public class JSONArrayRequest extends Request {
 
             int respondCode = connection.getResponseCode();
             if (200 == respondCode) {
-                if (successListener != null) {
-                    InputStream inputStream = connection.getInputStream();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                    StringBuilder builder = new StringBuilder();
-                    String temp;
-                    while ((temp = reader.readLine()) != null) {
-                        builder.append(temp);
-                    }
-                    reader.close();
-
-                    JSONArray object = new JSONArray(builder.toString());
-                    successListener.response(this,object);
+                InputStream inputStream = connection.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder builder = new StringBuilder();
+                String temp;
+                while ((temp = reader.readLine()) != null) {
+                    builder.append(temp);
                 }
+
+                reader.close();
+                String s = builder.toString();
+                Object object = new JSONTokener(s).nextValue();
+
+                if (successListenerObject != null &&
+                        (object instanceof JSONObject || object.toString().equals("null"))) {
+                    successListenerObject.response(this, (JSONObject) object);
+                } else if (successListenerArray != null && object instanceof JSONArray) {
+                    successListenerArray.response(this, (JSONArray) object);
+                }
+
                 return EXECUTION_REQUEST_SUCCESS;
             } else {
                 OnRequestFailedListener listener = getRequestFailedListener();
