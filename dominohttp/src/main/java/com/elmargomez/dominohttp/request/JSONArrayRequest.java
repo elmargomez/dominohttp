@@ -74,7 +74,7 @@ public class JSONArrayRequest extends Request {
                     reader.close();
 
                     JSONArray object = new JSONArray(builder.toString());
-                    successListener.response(object);
+                    successListener.response(this,object);
                 }
                 return EXECUTION_REQUEST_SUCCESS;
             } else {
@@ -88,7 +88,8 @@ public class JSONArrayRequest extends Request {
                         builder.append(temp);
                     }
                     reader.close();
-                    listener.response(builder.toString(), connection.getResponseCode());
+                    setErrorMessage(builder.toString());
+                    listener.response(this, respondCode);
                 }
                 return EXECUTION_REQUEST_ERROR;
             }

@@ -76,7 +76,7 @@ public class UploadJPEGRequest extends Request<UploadJPEGRequest> {
                         builder.append(temp);
                     }
                     reader.close();
-                    successListener.response(builder.toString());
+                    successListener.response(this, builder.toString());
                 }
                 return EXECUTION_REQUEST_SUCCESS;
             } else {
@@ -90,7 +90,8 @@ public class UploadJPEGRequest extends Request<UploadJPEGRequest> {
                         builder.append(temp);
                     }
                     reader.close();
-                    listener.response(builder.toString(), connection.getResponseCode());
+                    setErrorMessage(builder.toString());
+                    listener.response(this, respondCode);
                 }
                 return EXECUTION_REQUEST_ERROR;
             }

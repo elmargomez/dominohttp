@@ -56,7 +56,7 @@ public class RequestDispatcher extends Thread {
                             Request.OnInternalFailedListener listener =
                                     request.getInternalFailedListener();
                             if (listener != null) {
-                                listener.response(request.getErrorMessage());
+                                listener.response(request, request.getErrorMessage());
                             }
                         }
                         break;

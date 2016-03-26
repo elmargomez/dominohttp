@@ -104,16 +104,18 @@ public abstract class Request<T> {
         return dependent;
     }
 
-    public void setOnInternalFailedListener(OnInternalFailedListener f) {
+    public T setOnInternalFailedListener(OnInternalFailedListener f) {
         this.internalFailedListener = f;
+        return (T) this;
     }
 
     public OnInternalFailedListener getInternalFailedListener() {
         return internalFailedListener;
     }
 
-    public void setOnRequestFailedListener(OnRequestFailedListener f) {
+    public T setOnRequestFailedListener(OnRequestFailedListener f) {
         this.requestFailedListener = f;
+        return (T) this;
     }
 
     public OnRequestFailedListener getRequestFailedListener() {
@@ -142,12 +144,12 @@ public abstract class Request<T> {
         return connection;
     }
 
-    public void setErrorMessage(String errorMessage){
+    public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
     }
 
-    public String getErrorMessage(){
-        if(errorMessage == null)
+    public String getErrorMessage() {
+        if (errorMessage == null)
             return "";
 
         return errorMessage;
@@ -162,7 +164,7 @@ public abstract class Request<T> {
      */
     public interface OnSuccessListener<T> {
 
-        void response(T t);
+        void response(Request request, T t);
 
     }
 
@@ -171,13 +173,13 @@ public abstract class Request<T> {
      */
     public interface OnInternalFailedListener {
 
-        void response(String error);
+        void response(Request request);
 
     }
 
     public interface OnRequestFailedListener {
 
-        void response(String response, int statusCode);
+        void response(Request request, int statusCode);
 
     }
 

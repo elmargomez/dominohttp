@@ -31,7 +31,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 
-public class JSONObjectRequest extends Request {
+public class JSONObjectRequest extends Request<JSONObjectRequest> {
 
     protected OnSuccessListener<JSONObject> successListener;
     private String jsonBody;
@@ -40,12 +40,14 @@ public class JSONObjectRequest extends Request {
         setContentType(ContentType.APPLICATION_JSON);
     }
 
-    public void setJSONBody(String s) {
+    public JSONObjectRequest setJSONBody(String s) {
         jsonBody = s;
+        return this;
     }
 
-    public void setSuccessListener(OnSuccessListener<JSONObject> success) {
+    public JSONObjectRequest setOnSuccessListener(OnSuccessListener<JSONObject> success) {
         this.successListener = success;
+        return this;
     }
 
     public int executed() {
@@ -74,7 +76,7 @@ public class JSONObjectRequest extends Request {
                     reader.close();
 
                     JSONObject object = new JSONObject(builder.toString());
-                    successListener.response(object);
+                    successListener.response(this, object);
                 }
                 return EXECUTION_REQUEST_SUCCESS;
             } else {
@@ -88,7 +90,8 @@ public class JSONObjectRequest extends Request {
                         builder.append(temp);
                     }
                     reader.close();
-                    listener.response(builder.toString(), connection.getResponseCode());
+                    setErrorMessage(builder.toString());
+                    listener.response(this, respondCode);
                 }
                 return EXECUTION_REQUEST_ERROR;
             }
