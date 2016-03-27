@@ -53,7 +53,7 @@ public class RequestDispatcher extends Thread {
                         } else {
                             // Since the request error reached zero lets now fire the callback,
                             // all the other descending request will be dropped.
-                            Request.OnInternalFailedListener listener =
+                            Request.OnExceptionListener listener =
                                     request.getInternalFailedListener();
                             if (listener != null) {
                                 listener.response(request);

@@ -37,7 +37,7 @@ public abstract class Request<T> {
     private HashMap<String, String> header;
 
     // the listener for our request.
-    private OnInternalFailedListener internalFailedListener;
+    private OnExceptionListener internalFailedListener;
     private OnRequestFailedListener requestFailedListener;
 
     private int retryCount;
@@ -104,12 +104,12 @@ public abstract class Request<T> {
         return dependent;
     }
 
-    public T setOnInternalFailedListener(OnInternalFailedListener f) {
+    public T setOnInternalFailedListener(OnExceptionListener f) {
         this.internalFailedListener = f;
         return (T) this;
     }
 
-    public OnInternalFailedListener getInternalFailedListener() {
+    public OnExceptionListener getInternalFailedListener() {
         return internalFailedListener;
     }
 
@@ -162,7 +162,7 @@ public abstract class Request<T> {
      *
      * @param <T>
      */
-    public interface OnSuccessListener<T> {
+    public interface OnRequestSuccessListener<T> {
 
         void response(Request request, T t);
 
@@ -171,7 +171,7 @@ public abstract class Request<T> {
     /**
      * A Failure Listener
      */
-    public interface OnInternalFailedListener {
+    public interface OnExceptionListener {
 
         void response(Request request);
 

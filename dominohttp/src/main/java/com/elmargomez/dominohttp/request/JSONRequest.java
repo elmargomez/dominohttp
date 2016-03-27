@@ -35,8 +35,8 @@ import java.net.MalformedURLException;
 
 public class JSONRequest extends Request<JSONRequest> {
 
-    protected OnSuccessListener<JSONObject> successListenerObject;
-    protected OnSuccessListener<JSONArray> successListenerArray;
+    protected OnRequestSuccessListener<JSONObject> successListenerObject;
+    protected OnRequestSuccessListener<JSONArray> successListenerArray;
     private String jsonBody;
 
     public JSONRequest() {
@@ -56,12 +56,12 @@ public class JSONRequest extends Request<JSONRequest> {
         return setJSONBody(s.toString());
     }
 
-    public JSONRequest setOnJSONObjectListener(OnSuccessListener<JSONObject> success) {
+    public JSONRequest setOnJSONObjectListener(OnRequestSuccessListener<JSONObject> success) {
         this.successListenerObject = success;
         return this;
     }
 
-    public JSONRequest setOnJSONArrayListener(OnSuccessListener<JSONArray> success) {
+    public JSONRequest setOnJSONArrayListener(OnRequestSuccessListener<JSONArray> success) {
         this.successListenerArray = success;
         return this;
     }
@@ -99,7 +99,6 @@ public class JSONRequest extends Request<JSONRequest> {
                 } else if (successListenerArray != null && object instanceof JSONArray) {
                     successListenerArray.response(this, (JSONArray) object);
                 }
-
                 return EXECUTION_REQUEST_SUCCESS;
             } else {
                 OnRequestFailedListener listener = getRequestFailedListener();
