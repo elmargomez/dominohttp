@@ -38,7 +38,7 @@ public abstract class Request<T> {
 
     // the listener for our request.
     private OnExceptionListener internalFailedListener;
-    private OnRequestFailedListener requestFailedListener;
+    private FailedListener requestFailedListener;
 
     private int retryCount;
     private String errorMessage = null;
@@ -104,7 +104,7 @@ public abstract class Request<T> {
         return dependent;
     }
 
-    public T setOnInternalFailedListener(OnExceptionListener f) {
+    public T setInternalFailureListener(OnExceptionListener f) {
         this.internalFailedListener = f;
         return (T) this;
     }
@@ -113,12 +113,12 @@ public abstract class Request<T> {
         return internalFailedListener;
     }
 
-    public T setOnRequestFailedListener(OnRequestFailedListener f) {
+    public T setRequestFailedListener(FailedListener f) {
         this.requestFailedListener = f;
         return (T) this;
     }
 
-    public OnRequestFailedListener getRequestFailedListener() {
+    public FailedListener getRequestFailedListener() {
         return requestFailedListener;
     }
 
@@ -162,7 +162,7 @@ public abstract class Request<T> {
      *
      * @param <T>
      */
-    public interface OnRequestSuccessListener<T> {
+    public interface SuccessListener<T> {
 
         void response(Request request, T t);
 
@@ -177,7 +177,7 @@ public abstract class Request<T> {
 
     }
 
-    public interface OnRequestFailedListener {
+    public interface FailedListener {
 
         void response(Request request, int statusCode);
 
