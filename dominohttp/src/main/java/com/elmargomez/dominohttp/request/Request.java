@@ -17,6 +17,8 @@
 package com.elmargomez.dominohttp.request;
 
 import com.elmargomez.dominohttp.ContentType;
+import com.elmargomez.dominohttp.listener.FailedListener;
+import com.elmargomez.dominohttp.listener.OnExceptionListener;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -156,31 +158,5 @@ public abstract class Request<T> {
     }
 
     public abstract int executed();
-
-    /**
-     * Request Success Listener
-     *
-     * @param <T>
-     */
-    public interface SuccessListener<T> {
-
-        void response(Request request, T t);
-
-    }
-
-    /**
-     * A Failure Listener
-     */
-    public interface OnExceptionListener {
-
-        void response(Request request);
-
-    }
-
-    public interface FailedListener {
-
-        void response(Request request, int statusCode);
-
-    }
 
 }

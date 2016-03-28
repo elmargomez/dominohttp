@@ -16,6 +16,7 @@
 
 package com.elmargomez.dominohttp;
 
+import com.elmargomez.dominohttp.listener.OnExceptionListener;
 import com.elmargomez.dominohttp.request.Request;
 
 import java.util.concurrent.PriorityBlockingQueue;
@@ -53,7 +54,7 @@ public class RequestDispatcher extends Thread {
                         } else {
                             // Since the request error reached zero lets now fire the callback,
                             // all the other descending request will be dropped.
-                            Request.OnExceptionListener listener =
+                            OnExceptionListener listener =
                                     request.getInternalFailedListener();
                             if (listener != null) {
                                 listener.response(request);

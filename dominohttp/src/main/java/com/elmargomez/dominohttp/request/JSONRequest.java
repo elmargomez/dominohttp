@@ -17,6 +17,8 @@
 package com.elmargomez.dominohttp.request;
 
 import com.elmargomez.dominohttp.ContentType;
+import com.elmargomez.dominohttp.listener.FailedListener;
+import com.elmargomez.dominohttp.listener.SuccessListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
