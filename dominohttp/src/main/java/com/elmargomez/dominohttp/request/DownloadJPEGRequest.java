@@ -16,35 +16,29 @@
 
 package com.elmargomez.dominohttp.request;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 import com.elmargomez.dominohttp.ContentType;
 import com.elmargomez.dominohttp.listener.FailedListener;
 import com.elmargomez.dominohttp.listener.SuccessListener;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 
-public class UploadJPEGRequest extends Request<UploadJPEGRequest> {
+public class DownloadJPEGRequest extends Request<String> {
 
-    protected SuccessListener<String> successListener;
-    private String imagePath;
+    protected SuccessListener<Bitmap> successListener;
 
-    public UploadJPEGRequest() {
+    public DownloadJPEGRequest() {
         setContentType(ContentType.IMAGE_JPEG);
     }
 
-    public UploadJPEGRequest setImageURI(String s) {
-        imagePath = s;
-        return this;
-    }
-
-    public UploadJPEGRequest setSuccessListener(SuccessListener<String> success) {
+    public DownloadJPEGRequest setSuccessListener(SuccessListener<Bitmap> success) {
         this.successListener = success;
         return this;
     }
@@ -53,32 +47,27 @@ public class UploadJPEGRequest extends Request<UploadJPEGRequest> {
         try {
             HttpURLConnection connection = getConnection();
 
-            if (imagePath == null)
-                throw new NullPointerException("Image Path is null!");
-
-            File file = new File(imagePath);
-            FileInputStream fileInputStream = new FileInputStream(file);
-            OutputStream outputStream = connection.getOutputStream();
-            byte[] buff = new byte[1024];
-            int count;
-            while (-1 != (count = fileInputStream.read(buff))) {
-                outputStream.write(buff, 0, count);
-            }
-            outputStream.flush();
-            outputStream.close();
+//            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//            byte[] buff = new byte[1024];
+//            int count;
+//            while (-1 != (count = inputStream.read(buff))) {
+//                byteArrayOutputStream.write(buff, 0, count);
+//            }
+//            inputStream.close();
+//
+//            byte[] dataBytes = byteArrayOutputStream.toByteArray();
+//            byteArrayOutputStream.close();
+//
+//            InputStream a = new ByteArrayInputStream(dataBytes);
+//            InputStream b = new ByteArrayInputStream(dataBytes);
 
             int respondCode = connection.getResponseCode();
             if (200 == respondCode) {
                 if (successListener != null) {
                     InputStream inputStream = connection.getInputStream();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                    StringBuilder builder = new StringBuilder();
-                    String temp;
-                    while ((temp = reader.readLine()) != null) {
-                        builder.append(temp);
-                    }
-                    reader.close();
-                    successListener.response(this, builder.toString());
+                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                    inputStream.close();
+                    successListener.response(this, bitmap);
                 }
                 return EXECUTION_REQUEST_SUCCESS;
             } else {
@@ -103,6 +92,7 @@ public class UploadJPEGRequest extends Request<UploadJPEGRequest> {
         } catch (IOException e) {
             setErrorMessage("IOException :" + e.getMessage());
         }
+
         return EXECUTION_FAILURE_ON_DEPLOY;
     }
 

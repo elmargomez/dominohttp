@@ -34,7 +34,6 @@ public abstract class Request<T> {
     public static final int EXECUTION_REQUEST_ERROR = 1;
     public static final int EXECUTION_FAILURE_ON_DEPLOY = 2;
 
-
     private ArrayList<Request> dependent;
     private HashMap<String, String> header;
 
@@ -106,7 +105,7 @@ public abstract class Request<T> {
         return dependent;
     }
 
-    public T setInternalFailureListener(OnExceptionListener f) {
+    public T setExceptionListener(OnExceptionListener f) {
         this.internalFailedListener = f;
         return (T) this;
     }

@@ -16,26 +16,32 @@
 
 package com.elmargomez.dominohttp;
 
+import com.elmargomez.dominohttp.request.Request;
+
 public class Domino {
 
-    private static Domino domino;
     private RequestQueue requestQueue;
 
     private Domino() {
         requestQueue = new RequestQueue();
-        requestQueue.start();
     }
 
     public static Domino getInstance() {
-        if (domino == null) {
-            domino = new Domino();
-        }
+        Domino domino = new Domino();
+        domino.start();
         return domino;
     }
 
+    private void start() {
+        requestQueue.start();
+    }
+
     public void stop() {
-        if (requestQueue != null)
-            requestQueue.stop();
+        requestQueue.stop();
+    }
+
+    public void add(Request request) {
+        requestQueue.add(request);
     }
 
 }
