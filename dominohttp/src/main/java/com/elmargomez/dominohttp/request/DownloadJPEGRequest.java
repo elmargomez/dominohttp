@@ -30,7 +30,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 
-public class DownloadJPEGRequest extends Request<String> {
+public class DownloadJPEGRequest extends Request<DownloadJPEGRequest> {
 
     protected SuccessListener<Bitmap> successListener;
 
