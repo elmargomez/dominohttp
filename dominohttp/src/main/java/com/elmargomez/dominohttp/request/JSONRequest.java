@@ -130,4 +130,8 @@ public class JSONRequest extends Request<JSONRequest> {
     }
 
 
+    @Override
+    public int compareTo(Request<JSONRequest> another) {
+        return 0;
+    }
 }

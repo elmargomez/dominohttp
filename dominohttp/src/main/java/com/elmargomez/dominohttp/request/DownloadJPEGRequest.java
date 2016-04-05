@@ -97,4 +97,8 @@ public class DownloadJPEGRequest extends Request<DownloadJPEGRequest> {
     }
 
 
+    @Override
+    public int compareTo(Request<DownloadJPEGRequest> another) {
+        return 0;
+    }
 }

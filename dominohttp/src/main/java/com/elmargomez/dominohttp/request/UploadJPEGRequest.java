@@ -107,4 +107,8 @@ public class UploadJPEGRequest extends Request<UploadJPEGRequest> {
     }
 
 
+    @Override
+    public int compareTo(Request<UploadJPEGRequest> another) {
+        return 0;
+    }
 }

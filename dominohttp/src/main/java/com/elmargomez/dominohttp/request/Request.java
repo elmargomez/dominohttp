@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class Request<T> {
+public abstract class Request<T> implements Comparable<Request<T>> {
 
     public static final int EXECUTION_REQUEST_SUCCESS = 0;
     public static final int EXECUTION_REQUEST_ERROR = 1;
