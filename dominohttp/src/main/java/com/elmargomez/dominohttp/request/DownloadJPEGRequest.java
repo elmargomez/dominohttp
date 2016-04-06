@@ -33,6 +33,8 @@ import java.net.MalformedURLException;
 public class DownloadJPEGRequest extends Request<DownloadJPEGRequest> {
 
     private SuccessListener<Bitmap> successListener;
+    private String fileName;
+    private String location;
 
     public DownloadJPEGRequest() {
         setContentType(ContentType.IMAGE_JPEG);
@@ -43,23 +45,22 @@ public class DownloadJPEGRequest extends Request<DownloadJPEGRequest> {
         return this;
     }
 
+    /**
+     * Sets the name of the image without the file extension.
+     *
+     * @param fileName the desired file name of the image without file extension.
+     */
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public void setStorageLocation(String location) {
+        this.location = location;
+    }
+
     public int executed() {
         try {
             HttpURLConnection connection = getConnection();
-
-//            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//            byte[] buff = new byte[1024];
-//            int count;
-//            while (-1 != (count = inputStream.read(buff))) {
-//                byteArrayOutputStream.write(buff, 0, count);
-//            }
-//            inputStream.close();
-//
-//            byte[] dataBytes = byteArrayOutputStream.toByteArray();
-//            byteArrayOutputStream.close();
-//
-//            InputStream a = new ByteArrayInputStream(dataBytes);
-//            InputStream b = new ByteArrayInputStream(dataBytes);
 
             int respondCode = connection.getResponseCode();
             if (200 == respondCode) {
@@ -101,4 +102,5 @@ public class DownloadJPEGRequest extends Request<DownloadJPEGRequest> {
     public int compareTo(Request<DownloadJPEGRequest> another) {
         return 0;
     }
+
 }
