@@ -37,8 +37,8 @@ import java.net.MalformedURLException;
 
 public class JSONRequest extends Request<JSONRequest> {
 
-    protected SuccessListener<JSONObject> successListenerObject;
-    protected SuccessListener<JSONArray> successListenerArray;
+    private SuccessListener<JSONObject> successListenerObject;
+    private SuccessListener<JSONArray> successListenerArray;
     private String jsonBody;
 
     public JSONRequest() {
@@ -82,6 +82,7 @@ public class JSONRequest extends Request<JSONRequest> {
             }
 
             int respondCode = connection.getResponseCode();
+
             if (200 == respondCode) {
                 InputStream inputStream = connection.getInputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));

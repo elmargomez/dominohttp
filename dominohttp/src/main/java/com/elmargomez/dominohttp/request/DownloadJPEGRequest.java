@@ -32,7 +32,7 @@ import java.net.MalformedURLException;
 
 public class DownloadJPEGRequest extends Request<DownloadJPEGRequest> {
 
-    protected SuccessListener<Bitmap> successListener;
+    private SuccessListener<Bitmap> successListener;
 
     public DownloadJPEGRequest() {
         setContentType(ContentType.IMAGE_JPEG);

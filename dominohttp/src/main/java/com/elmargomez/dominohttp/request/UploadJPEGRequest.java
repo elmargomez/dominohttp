@@ -32,7 +32,7 @@ import java.net.MalformedURLException;
 
 public class UploadJPEGRequest extends Request<UploadJPEGRequest> {
 
-    protected SuccessListener<String> successListener;
+    private SuccessListener<String> successListener;
     private String imagePath;
 
     public UploadJPEGRequest() {
