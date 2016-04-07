@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class Request<T> implements Comparable<Request<T>> {
+public abstract class Request implements Comparable<Request> {
 
     public static final int EXECUTION_REQUEST_SUCCESS = 0;
     public static final int EXECUTION_REQUEST_ERROR = 1;
@@ -54,23 +54,16 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         this.retryCount = -1;
     }
 
-    public T setContentType(String string) {
+    public void setContentType(String string) {
         this.contentType = string;
-        return (T) this;
     }
 
-    public String getContentType() {
-        return contentType;
-    }
-
-    public T setMethod(String method) {
+    public void setMethod(String method) {
         this.method = method;
-        return (T) this;
     }
 
-    public T setRetryCount(int c) {
+    public void setRetryCount(int c) {
         this.retryCount = c;
-        return (T) this;
     }
 
     public void decrimentRetryLeft() {
@@ -86,44 +79,44 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         return (retryCount != 0);
     }
 
-    public T setURL(String url) {
+    public void setURL(String url) {
         this.stringURL = url;
-        return (T) this;
     }
 
-    public T addDependant(Request dependentR) {
+    public void addDependant(Request dependentR) {
         dependent.add(dependentR);
-        return (T) this;
     }
 
-    public T addHeader(String key, String val) {
+    public void addHeader(String key, String val) {
         header.put(key, val);
-        return (T) this;
     }
 
     public ArrayList<Request> getDependentRequests() {
         return dependent;
     }
 
-    public T setExceptionListener(OnExceptionListener f) {
+    public void setExceptionListener(OnExceptionListener f) {
         this.internalFailedListener = f;
-        return (T) this;
     }
 
     public OnExceptionListener getInternalFailedListener() {
         return internalFailedListener;
     }
 
-    public T setRequestFailedListener(FailedListener f) {
+    public void setRequestFailedListener(FailedListener f) {
         this.requestFailedListener = f;
-        return (T) this;
     }
 
     public FailedListener getRequestFailedListener() {
         return requestFailedListener;
     }
 
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
     public HttpURLConnection getConnection() throws IOException {
+
         if (stringURL == null)
             throw new NullPointerException("URL is null.");
 
@@ -142,20 +135,79 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         for (Map.Entry<String, String> entry : entries) {
             connection.setRequestProperty(entry.getKey(), entry.getValue());
         }
-        return connection;
-    }
 
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
+        return connection;
     }
 
     public String getErrorMessage() {
         if (errorMessage == null)
             return "";
-
         return errorMessage;
     }
 
     public abstract int executed();
 
+    /**
+     * The builder class for the {@link Request}.
+     *
+     * @param <T>  The derived {@link Request} class.
+     * @param <T1> The derived {@link com.elmargomez.dominohttp.request.Request.Builder} class.
+     */
+    public static abstract class Builder<T extends Request, T1> {
+
+        private T buildClass;
+
+        public Builder(Class<T> tClass) {
+            try {
+                buildClass = tClass.newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public T1 setContentType(String string) {
+            buildClass.setContentType(string);
+            return (T1)this;
+        }
+
+        public T1 setMethod(String method) {
+            buildClass.setContentType(method);
+            return (T1)this;
+        }
+
+        public T1 setRetryCount(int c) {
+            buildClass.setRetryCount(c);
+            return (T1)this;
+        }
+
+        public T1 setURL(String url) {
+            buildClass.setURL(url);
+            return (T1)this;
+        }
+
+        public T1 addDependant(Request request) {
+            buildClass.addDependant(request);
+            return (T1)this;
+        }
+
+        public T1 addHeader(String key, String val) {
+            buildClass.addHeader(key, val);
+            return (T1)this;
+        }
+
+        public T1 setExceptionListener(OnExceptionListener f) {
+            buildClass.setExceptionListener(f);
+            return (T1)this;
+        }
+
+        public T1 setRequestFailedListener(FailedListener f) {
+            buildClass.setRequestFailedListener(f);
+            return (T1)this;
+        }
+
+        public abstract T build();
+
+    }
 }

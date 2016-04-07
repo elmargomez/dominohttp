@@ -103,4 +103,35 @@ public class DownloadJPEGRequest extends Request<DownloadJPEGRequest> {
         return 0;
     }
 
+
+    public static class Builder implements Request.Builder<DownloadJPEGRequest> {
+        private String fileName;
+        private String location;
+
+        public Builder setFileName(String fileName) {
+            this.fileName = fileName;
+            return this;
+        }
+
+        public Builder setStorageLocation(String location) {
+            this.location = location;
+            return this;
+        }
+
+        @Override
+        public DownloadJPEGRequest build() {
+            if (fileName == null)
+                throw new NullPointerException("Filename must not be null!");
+
+            if (location == null)
+                throw new NullPointerException("The target path must not be null!");
+
+            DownloadJPEGRequest request = new DownloadJPEGRequest();
+            request.setFileName(fileName);
+            request.setStorageLocation(location);
+            return request;
+        }
+
+    }
+
 }
