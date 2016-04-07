@@ -30,7 +30,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 
-public class DownloadJPEGRequest extends Request<DownloadJPEGRequest> {
+public class DownloadJPEGRequest extends Request {
 
     private SuccessListener<Bitmap> successListener;
     private String fileName;
@@ -99,14 +99,20 @@ public class DownloadJPEGRequest extends Request<DownloadJPEGRequest> {
 
 
     @Override
-    public int compareTo(Request<DownloadJPEGRequest> another) {
+    public int compareTo(Request another) {
         return 0;
     }
 
 
-    public static class Builder implements Request.Builder<DownloadJPEGRequest> {
+    public static class Builder extends Request.Builder<DownloadJPEGRequest, Builder> {
+
+        private SuccessListener<Bitmap> successListener;
         private String fileName;
         private String location;
+
+        public Builder() {
+            super(DownloadJPEGRequest.class);
+        }
 
         public Builder setFileName(String fileName) {
             this.fileName = fileName;
@@ -118,17 +124,25 @@ public class DownloadJPEGRequest extends Request<DownloadJPEGRequest> {
             return this;
         }
 
+        public Builder setSuccessListener(SuccessListener<Bitmap> success) {
+            this.successListener = success;
+            return this;
+        }
+
         @Override
         public DownloadJPEGRequest build() {
+
             if (fileName == null)
                 throw new NullPointerException("Filename must not be null!");
 
             if (location == null)
                 throw new NullPointerException("The target path must not be null!");
 
-            DownloadJPEGRequest request = new DownloadJPEGRequest();
+            DownloadJPEGRequest request = getBuildClass();
             request.setFileName(fileName);
             request.setStorageLocation(location);
+            request.setSuccessListener(successListener);
+
             return request;
         }
 

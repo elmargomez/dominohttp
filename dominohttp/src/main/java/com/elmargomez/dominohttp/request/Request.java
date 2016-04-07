@@ -207,6 +207,10 @@ public abstract class Request implements Comparable<Request> {
             return (T1)this;
         }
 
+        protected T getBuildClass(){
+            return buildClass;
+        }
+
         public abstract T build();
 
     }
