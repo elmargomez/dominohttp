@@ -30,7 +30,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 
-public class UploadJPEGRequest extends Request<UploadJPEGRequest> {
+public class UploadJPEGRequest extends Request {
 
     private SuccessListener<String> successListener;
     private String imagePath;
@@ -39,22 +39,17 @@ public class UploadJPEGRequest extends Request<UploadJPEGRequest> {
         setContentType(ContentType.IMAGE_JPEG);
     }
 
-    public UploadJPEGRequest setImageURI(String s) {
+    public void setImageURI(String s) {
         imagePath = s;
-        return this;
     }
 
-    public UploadJPEGRequest setSuccessListener(SuccessListener<String> success) {
+    public void setSuccessListener(SuccessListener<String> success) {
         this.successListener = success;
-        return this;
     }
 
     public int executed() {
         try {
             HttpURLConnection connection = getConnection();
-
-            if (imagePath == null)
-                throw new NullPointerException("Image Path is null!");
 
             File file = new File(imagePath);
             FileInputStream fileInputStream = new FileInputStream(file);
@@ -106,9 +101,40 @@ public class UploadJPEGRequest extends Request<UploadJPEGRequest> {
         return EXECUTION_FAILURE_ON_DEPLOY;
     }
 
-
     @Override
-    public int compareTo(Request<UploadJPEGRequest> another) {
+    public int compareTo(Request another) {
         return 0;
+    }
+
+    public static class Builder extends Request.Builder<UploadJPEGRequest, Builder> {
+
+        private SuccessListener<String> successListener;
+        private String imagePath;
+
+        public Builder() {
+            super(UploadJPEGRequest.class);
+        }
+
+        public Builder setSuccessListener(SuccessListener<String> success) {
+            this.successListener = success;
+            return this;
+        }
+
+        public Builder setImageURI(String s) {
+            imagePath = s;
+            return this;
+        }
+
+        @Override
+        public UploadJPEGRequest build() {
+
+            if (imagePath == null)
+                throw new NullPointerException("Image Path is null!");
+
+            UploadJPEGRequest c = getBuildClass();
+            c.setImageURI(imagePath);
+            c.setSuccessListener(successListener);
+            return null;
+        }
     }
 }
