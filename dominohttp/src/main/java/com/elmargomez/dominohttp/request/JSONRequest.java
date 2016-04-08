@@ -35,7 +35,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 
-public class JSONRequest extends Request<JSONRequest> {
+public class JSONRequest extends Request {
 
     private SuccessListener<JSONObject> successListenerObject;
     private SuccessListener<JSONArray> successListenerArray;
@@ -45,27 +45,24 @@ public class JSONRequest extends Request<JSONRequest> {
         setContentType(ContentType.APPLICATION_JSON);
     }
 
-    public JSONRequest setJSONBody(String s) {
+    public void setJSONBody(String s) {
         jsonBody = s;
-        return this;
     }
 
-    public JSONRequest setJSONBody(JSONObject s) {
-        return setJSONBody(s.toString());
+    public void setJSONBody(JSONObject s) {
+        setJSONBody(s.toString());
     }
 
-    public JSONRequest setJSONBody(JSONArray s) {
-        return setJSONBody(s.toString());
+    public void setJSONBody(JSONArray s) {
+        setJSONBody(s.toString());
     }
 
-    public JSONRequest setJSONObjectRequestListener(SuccessListener<JSONObject> success) {
+    public void setJSONObjectRequestListener(SuccessListener<JSONObject> success) {
         this.successListenerObject = success;
-        return this;
     }
 
-    public JSONRequest setJSONArrayRequestListener(SuccessListener<JSONArray> success) {
+    public void setJSONArrayRequestListener(SuccessListener<JSONArray> success) {
         this.successListenerArray = success;
-        return this;
     }
 
     public int executed() {
@@ -132,7 +129,48 @@ public class JSONRequest extends Request<JSONRequest> {
 
 
     @Override
-    public int compareTo(Request<JSONRequest> another) {
+    public int compareTo(Request another) {
         return 0;
+    }
+
+    public static class Builder extends Request.Builder<JSONRequest, Builder> {
+
+        private SuccessListener<JSONObject> successListenerObject;
+        private SuccessListener<JSONArray> successListenerArray;
+        private String jsonBody;
+
+        public Builder() {
+            super(JSONRequest.class);
+        }
+
+        public void setJSONBody(String s) {
+            jsonBody = s;
+        }
+
+        public void setJSONBody(JSONObject s) {
+            setJSONBody(s.toString());
+        }
+
+        public void setJSONBody(JSONArray s) {
+            setJSONBody(s.toString());
+        }
+
+        public void setJSONObjectRequestListener(SuccessListener<JSONObject> success) {
+            this.successListenerObject = success;
+        }
+
+        public void setJSONArrayRequestListener(SuccessListener<JSONArray> success) {
+            this.successListenerArray = success;
+        }
+
+        @Override
+        public JSONRequest build() {
+            JSONRequest request = getBuildClass();
+            request.setJSONBody(jsonBody);
+            request.setJSONArrayRequestListener(successListenerArray);
+            request.setJSONObjectRequestListener(successListenerObject);
+            return request;
+        }
+
     }
 }
