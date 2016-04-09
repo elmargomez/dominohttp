@@ -33,7 +33,7 @@ import java.net.MalformedURLException;
 
 public class DownloadJPEGRequest extends Request {
 
-    private SuccessListener<String> successListener;
+    private SuccessListener<File> successListener;
     private String fileName;
     private String location;
     private int width;
@@ -43,7 +43,7 @@ public class DownloadJPEGRequest extends Request {
         setContentType(ContentType.IMAGE_JPEG);
     }
 
-    public DownloadJPEGRequest setSuccessListener(SuccessListener<String> success) {
+    public DownloadJPEGRequest setSuccessListener(SuccessListener<File> success) {
         this.successListener = success;
         return this;
     }
@@ -76,9 +76,9 @@ public class DownloadJPEGRequest extends Request {
 
         try {
             HttpURLConnection conn = getConnection();
-            File emptyFile = File.createTempFile(fileName, ".jpg", new File(location));
+            File destinationFile = File.createTempFile(fileName, ".jpg", new File(location));
 
-            outputFile = new FileOutputStream(emptyFile);
+            outputFile = new FileOutputStream(destinationFile);
             in = conn.getInputStream();
             byte[] buffer = new byte[1024];
             int n;
@@ -93,11 +93,11 @@ public class DownloadJPEGRequest extends Request {
                     // get the width and height og the image
                     BitmapFactory.Options option = new BitmapFactory.Options();
                     option.inJustDecodeBounds = true; // meaning decode only the size and no creation
-                    BitmapFactory.decodeFile(emptyFile.getAbsolutePath(), option);
+                    BitmapFactory.decodeFile(destinationFile.getAbsolutePath(), option);
                     width = option.outWidth;
                     height = option.outHeight;
 
-                    successListener.response(this, location + fileName + ".jpg");
+                    successListener.response(this, destinationFile);
                 }
                 return EXECUTION_REQUEST_SUCCESS;
             } else {
@@ -158,7 +158,7 @@ public class DownloadJPEGRequest extends Request {
 
     public static class Builder extends Request.Builder<DownloadJPEGRequest, Builder> {
 
-        private SuccessListener<String> successListener;
+        private SuccessListener<File> successListener;
         private String fileName;
         private String location;
 
@@ -176,7 +176,7 @@ public class DownloadJPEGRequest extends Request {
             return this;
         }
 
-        public Builder setSuccessListener(SuccessListener<String> success) {
+        public Builder setSuccessListener(SuccessListener<File> success) {
             this.successListener = success;
             return this;
         }
