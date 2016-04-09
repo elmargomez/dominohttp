@@ -218,6 +218,8 @@ public class JSONRequest extends Request {
         @Override
         public JSONRequest build() {
             JSONRequest request = getBuildClass();
+            // check first if the parameter was properly supplied.
+            request.validateParameters();
             request.setJSONBody(jsonBody);
             request.setJSONArrayRequestListener(successListenerArray);
             request.setJSONObjectRequestListener(successListenerObject);

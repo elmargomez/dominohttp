@@ -132,6 +132,8 @@ public class UploadJPEGRequest extends Request {
                 throw new NullPointerException("Image Path is null!");
 
             UploadJPEGRequest c = getBuildClass();
+            // check first if the parameter was properly supplied.
+            c.validateParameters();
             c.setImageURI(imagePath);
             c.setSuccessListener(successListener);
             return null;

@@ -191,6 +191,8 @@ public class DownloadJPEGRequest extends Request {
                 throw new NullPointerException("The target path must not be null!");
 
             DownloadJPEGRequest request = getBuildClass();
+            // check first if the parameter was properly supplied.
+            request.validateParameters();
             request.setFileName(fileName);
             request.setStorageLocation(location);
             request.setSuccessListener(successListener);

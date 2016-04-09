@@ -66,7 +66,7 @@ public abstract class Request implements Comparable<Request> {
         this.retryCount = c;
     }
 
-    public void decrimentRetryLeft() {
+    public void decrementRetryLeft() {
         if (retryCount == -1)
             return;
 
@@ -115,18 +115,19 @@ public abstract class Request implements Comparable<Request> {
         this.errorMessage = errorMessage;
     }
 
-    public HttpURLConnection getConnection() throws IOException {
-
+    protected void validateParameters() {
         if (stringURL == null)
             throw new NullPointerException("URL is null.");
 
         if (method == null)
-            throw new NullPointerException("Method is null, please add method e.g POST.");
+            throw new NullPointerException("Method is null, please add method e.g. POST,PUT etc.");
 
         if (contentType == null)
             throw new NullPointerException("Content Type is null, please add Content-Type " +
                     "e.g. application/json");
+    }
 
+    protected HttpURLConnection getConnection() throws IOException {
         URL url = new URL(stringURL);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod(method);
@@ -169,45 +170,45 @@ public abstract class Request implements Comparable<Request> {
 
         public T1 setContentType(String string) {
             buildClass.setContentType(string);
-            return (T1)this;
+            return (T1) this;
         }
 
         public T1 setMethod(String method) {
             buildClass.setContentType(method);
-            return (T1)this;
+            return (T1) this;
         }
 
         public T1 setRetryCount(int c) {
             buildClass.setRetryCount(c);
-            return (T1)this;
+            return (T1) this;
         }
 
         public T1 setURL(String url) {
             buildClass.setURL(url);
-            return (T1)this;
+            return (T1) this;
         }
 
         public T1 addDependant(Request request) {
             buildClass.addDependant(request);
-            return (T1)this;
+            return (T1) this;
         }
 
         public T1 addHeader(String key, String val) {
             buildClass.addHeader(key, val);
-            return (T1)this;
+            return (T1) this;
         }
 
         public T1 setExceptionListener(OnExceptionListener f) {
             buildClass.setExceptionListener(f);
-            return (T1)this;
+            return (T1) this;
         }
 
         public T1 setRequestFailedListener(FailedListener f) {
             buildClass.setRequestFailedListener(f);
-            return (T1)this;
+            return (T1) this;
         }
 
-        protected T getBuildClass(){
+        protected T getBuildClass() {
             return buildClass;
         }
 

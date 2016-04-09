@@ -49,7 +49,7 @@ public class RequestDispatcher extends Thread {
                         if (request.canRetry()) {
                             // While the request fails, let us add it again to the queue
                             // until the retry count reached to 0.
-                            request.decrimentRetryLeft();
+                            request.decrementRetryLeft();
                             requestOrder.add(request);
                         } else {
                             // Since the request error reached zero lets now fire the callback,
