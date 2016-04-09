@@ -174,7 +174,6 @@ public class JSONRequest extends Request {
         return EXECUTION_FAILURE_ON_DEPLOY;
     }
 
-
     @Override
     public int compareTo(Request another) {
         return 0;

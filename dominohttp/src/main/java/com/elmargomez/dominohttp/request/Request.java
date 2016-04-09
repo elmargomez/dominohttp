@@ -46,6 +46,7 @@ public abstract class Request implements Comparable<Request> {
     private String contentType = null;
     private String method = null;
     private String stringURL = null;
+    private String debugKey = null;
 
     public Request() {
         this.dependent = new ArrayList<>();
@@ -117,14 +118,15 @@ public abstract class Request implements Comparable<Request> {
 
     protected void validateParameters() {
         if (stringURL == null)
-            throw new NullPointerException("URL is null.");
+            throw new NullPointerException("URL is null. key:" + getDebugKey());
 
         if (method == null)
-            throw new NullPointerException("Method is null, please add method e.g. POST,PUT etc.");
+            throw new NullPointerException("Method is null, please add method " +
+                    "e.g. POST,PUT etc. key:" + getDebugKey());
 
         if (contentType == null)
             throw new NullPointerException("Content Type is null, please add Content-Type " +
-                    "e.g. application/json");
+                    "e.g. application/json. key:" + getDebugKey());
     }
 
     protected HttpURLConnection getConnection() throws IOException {
@@ -144,6 +146,17 @@ public abstract class Request implements Comparable<Request> {
         if (errorMessage == null)
             return "";
         return errorMessage;
+    }
+
+    public void setDebugKey(String mes) {
+        this.debugKey = mes;
+    }
+
+    public String getDebugKey() {
+        if (debugKey == null)
+            return "<no key>";
+
+        return debugKey;
     }
 
     public abstract int executed();
@@ -174,7 +187,7 @@ public abstract class Request implements Comparable<Request> {
         }
 
         public T1 setMethod(String method) {
-            buildClass.setContentType(method);
+            buildClass.setMethod(method);
             return (T1) this;
         }
 
@@ -205,6 +218,11 @@ public abstract class Request implements Comparable<Request> {
 
         public T1 setRequestFailedListener(FailedListener f) {
             buildClass.setRequestFailedListener(f);
+            return (T1) this;
+        }
+
+        public T1 setDebugKey(String mes) {
+            buildClass.setDebugKey(mes);
             return (T1) this;
         }
 
