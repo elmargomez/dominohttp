@@ -66,30 +66,35 @@ public class JSONRequest extends Request {
     }
 
     public int executed() {
+        OutputStream outputStream = null;
+        BufferedWriter buffWriter = null;
+        InputStream resultStream = null;
+        BufferedReader resultReader = null;
+        InputStream errorStream = null;
+        BufferedReader errorReader = null;
+
         try {
             HttpURLConnection connection = getConnection();
 
             if (jsonBody != null) {
-                OutputStream outputStream = connection.getOutputStream();
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream,
+                outputStream = connection.getOutputStream();
+                buffWriter = new BufferedWriter(new OutputStreamWriter(outputStream,
                         "UTF-8"));
-                writer.write(jsonBody);
-                writer.flush();
-                writer.close();
+                buffWriter.write(jsonBody);
+                buffWriter.flush();
             }
 
             int respondCode = connection.getResponseCode();
 
             if (200 == respondCode) {
-                InputStream inputStream = connection.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                resultStream = connection.getInputStream();
+                resultReader = new BufferedReader(new InputStreamReader(resultStream));
+
                 StringBuilder builder = new StringBuilder();
                 String temp;
-                while ((temp = reader.readLine()) != null) {
+                while ((temp = resultReader.readLine()) != null) {
                     builder.append(temp);
                 }
-
-                reader.close();
                 String s = builder.toString();
                 Object object = new JSONTokener(s).nextValue();
 
@@ -103,14 +108,13 @@ public class JSONRequest extends Request {
             } else {
                 FailedListener listener = getRequestFailedListener();
                 if (listener != null) {
-                    InputStream inputStream = connection.getErrorStream();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                    errorStream = connection.getErrorStream();
+                    errorReader = new BufferedReader(new InputStreamReader(errorStream));
                     StringBuilder builder = new StringBuilder();
                     String temp;
-                    while ((temp = reader.readLine()) != null) {
+                    while ((temp = errorReader.readLine()) != null) {
                         builder.append(temp);
                     }
-                    reader.close();
                     setErrorMessage(builder.toString());
                     listener.response(this, respondCode);
                 }
@@ -123,6 +127,49 @@ public class JSONRequest extends Request {
             setErrorMessage("IOException :" + e.getMessage());
         } catch (JSONException e) {
             setErrorMessage("JSONException :" + e.getMessage());
+        } finally {
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    //ignore
+                }
+            }
+            if (buffWriter != null) {
+                try {
+                    buffWriter.close();
+                } catch (IOException e) {
+                    //ignore
+                }
+            }
+            if (resultStream != null) {
+                try {
+                    resultStream.close();
+                } catch (IOException e) {
+                    //ignore
+                }
+            }
+            if (resultReader != null) {
+                try {
+                    resultReader.close();
+                } catch (IOException e) {
+                    //ignore
+                }
+            }
+            if (errorStream != null) {
+                try {
+                    errorStream.close();
+                } catch (IOException e) {
+                    //ignore
+                }
+            }
+            if (errorReader != null) {
+                try {
+                    errorReader.close();
+                } catch (IOException e) {
+                    //ignore
+                }
+            }
         }
         return EXECUTION_FAILURE_ON_DEPLOY;
     }
@@ -143,24 +190,29 @@ public class JSONRequest extends Request {
             super(JSONRequest.class);
         }
 
-        public void setJSONBody(String s) {
+        public Builder setJSONBody(String s) {
             jsonBody = s;
+            return this;
         }
 
-        public void setJSONBody(JSONObject s) {
+        public Builder setJSONBody(JSONObject s) {
             setJSONBody(s.toString());
+            return this;
         }
 
-        public void setJSONBody(JSONArray s) {
+        public Builder setJSONBody(JSONArray s) {
             setJSONBody(s.toString());
+            return this;
         }
 
-        public void setJSONObjectRequestListener(SuccessListener<JSONObject> success) {
+        public Builder setJSONObjectRequestListener(SuccessListener<JSONObject> success) {
             this.successListenerObject = success;
+            return this;
         }
 
-        public void setJSONArrayRequestListener(SuccessListener<JSONArray> success) {
+        public Builder setJSONArrayRequestListener(SuccessListener<JSONArray> success) {
             this.successListenerArray = success;
+            return this;
         }
 
         @Override
