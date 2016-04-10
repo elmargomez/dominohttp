@@ -49,13 +49,12 @@ public class RequestDispatcher extends Thread {
                         if (request.canRetry()) {
                             // While the request fails, let us add it again to the queue
                             // until the retry count reached to 0.
-                            request.decrementRetryLeft();
+                            request.decrementRetryCount();
                             requestOrder.add(request);
                         } else {
                             // Since the request error reached zero lets now fire the callback,
                             // all the other descending request will be dropped.
-                            OnExceptionListener listener =
-                                    request.getInternalFailedListener();
+                            OnExceptionListener listener = request.getInternalFailedListener();
                             if (listener != null) {
                                 listener.response(request);
                             }

@@ -42,6 +42,7 @@ public abstract class Request implements Comparable<Request> {
     private FailedListener requestFailedListener;
 
     private int retryCount;
+    private Object tag = null;
     private String errorMessage = null;
     private String contentType = null;
     private String method = null;
@@ -53,6 +54,14 @@ public abstract class Request implements Comparable<Request> {
         this.header = new HashMap<>();
         this.contentType = ContentType.APPLICATION_JSON;
         this.retryCount = -1;
+    }
+
+    public void setTag(Object object){
+        tag = object;
+    }
+
+    public Object getTag(){
+        return tag;
     }
 
     public void setContentType(String string) {
@@ -67,7 +76,7 @@ public abstract class Request implements Comparable<Request> {
         this.retryCount = c;
     }
 
-    public void decrementRetryLeft() {
+    public void decrementRetryCount() {
         if (retryCount == -1)
             return;
 
