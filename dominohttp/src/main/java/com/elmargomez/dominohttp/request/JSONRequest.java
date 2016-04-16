@@ -85,7 +85,6 @@ public class JSONRequest extends Request {
             }
 
             int respondCode = connection.getResponseCode();
-
             if (200 == respondCode) {
                 resultStream = connection.getInputStream();
                 resultReader = new BufferedReader(new InputStreamReader(resultStream));

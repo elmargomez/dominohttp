@@ -56,11 +56,11 @@ public abstract class Request implements Comparable<Request> {
         this.retryCount = -1;
     }
 
-    public void setTag(Object object){
+    public void setTag(Object object) {
         tag = object;
     }
 
-    public Object getTag(){
+    public Object getTag() {
         return tag;
     }
 
@@ -233,6 +233,15 @@ public abstract class Request implements Comparable<Request> {
         public T1 setDebugKey(String mes) {
             buildClass.setDebugKey(mes);
             return (T1) this;
+        }
+
+        public T1 setTag(Object object) {
+            buildClass.setTag(object);
+            return (T1) this;
+        }
+
+        public Object getTag() {
+            return buildClass.getTag();
         }
 
         protected T getBuildClass() {
