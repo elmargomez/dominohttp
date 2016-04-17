@@ -23,14 +23,22 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class RequestQueue {
+    private static final int THREAD_DEF_SIZE = 4;
 
-    private BlockingQueue<Request> requestQueue = new PriorityBlockingQueue<>();
+    private final BlockingQueue<Request> requestQueue = new PriorityBlockingQueue<>();
+    private RequestDispatcher[] dispatchers;
+
     private HttpClient httpClient = null;
     private CacheBank cacheBank = null;
 
     public RequestQueue(HttpClient client, CacheBank cacheBank) {
+        this(client, cacheBank, THREAD_DEF_SIZE);
+    }
+
+    public RequestQueue(HttpClient client, CacheBank cacheBank, int threadCount) {
         this.httpClient = client;
         this.cacheBank = cacheBank;
+        this.dispatchers = new RequestDispatcher[threadCount];
     }
 
     public static RequestQueue getInstance(Context context, HttpClient client) {
@@ -43,7 +51,7 @@ public class RequestQueue {
     }
 
     public void request(Request request, String id) {
-        request.id = id;
+        request.responseID = id;
         requestQueue.add(request);
     }
 

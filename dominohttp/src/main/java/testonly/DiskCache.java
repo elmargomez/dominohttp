@@ -17,15 +17,17 @@
 package testonly;
 
 import java.io.File;
-import java.security.Key;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 public class DiskCache implements CacheBank {
 
-    private final Map<String, Key> cachedHeaders = new HashMap<>();
+    private final Map<String, CacheHeader> cachedHeaders = new HashMap<>();
     private File cacheFile;
-    private int cachedSize;
+    private int size;
 
     public DiskCache(File cacheFile) {
         this.cacheFile = cacheFile;
@@ -34,7 +36,17 @@ public class DiskCache implements CacheBank {
 
     @Override
     public void init() {
+        File[] files = cacheFile.listFiles();
+        if (files == null)
+            return;
 
+        for(File f : files){
+            try {
+                InputStream stream = new FileInputStream(f);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -50,8 +62,6 @@ public class DiskCache implements CacheBank {
     public static String makeFolderName(String name) {
         return name;
     }
-
-
 
     private class CacheHeader {
         public Map<String, String> header;

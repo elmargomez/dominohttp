@@ -43,11 +43,11 @@ public class RequestDispatcher extends Thread {
                         requestOrder.addAll(request.getDependentRequests());
                         break;
                     case Request.EXECUTION_REQUEST_ERROR:
-                        // TODO add something later
+                        // TODO addHeader something later
                         break;
                     case Request.EXECUTION_FAILURE_ON_DEPLOY:
                         if (request.canRetry()) {
-                            // While the request fails, let us add it again to the queue
+                            // While the request fails, let us addHeader it again to the queue
                             // until the retry count reached to 0.
                             request.decrementRetryCount();
                             requestOrder.add(request);

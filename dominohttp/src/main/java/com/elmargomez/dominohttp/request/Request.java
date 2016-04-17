@@ -130,11 +130,11 @@ public abstract class Request implements Comparable<Request> {
             throw new NullPointerException("URL is null. key:" + getDebugKey());
 
         if (method == null)
-            throw new NullPointerException("Method is null, please add method " +
+            throw new NullPointerException("Method is null, please addHeader method " +
                     "e.g. POST,PUT etc. key:" + getDebugKey());
 
         if (contentType == null)
-            throw new NullPointerException("Content Type is null, please add Content-Type " +
+            throw new NullPointerException("Content Type is null, please addHeader Content-Type " +
                     "e.g. application/json. key:" + getDebugKey());
     }
 

@@ -16,14 +16,32 @@
 
 package testonly;
 
-public class RequestDispatcher extends Thread {
+import java.util.concurrent.BlockingQueue;
 
+public class RequestDispatcher extends Thread {
+    private BlockingQueue<Request> requests;
+    private CacheBank cacheBank;
     private boolean stoped;
+
+    public RequestDispatcher(BlockingQueue<Request> requests, CacheBank cache) {
+        this.requests = requests;
+        this.cacheBank = cache;
+    }
 
     @Override
     public void run() {
         while (true) {
+            Request request;
+            try {
+                request = requests.take();
 
+                // check if request has cached
+                CacheBank.CacheContent cacheContent = cacheBank.get(request.responseID);
+
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
