@@ -39,7 +39,7 @@ public class RequestDispatcher extends Thread {
                 switch (req) {
                     case Request.EXECUTION_REQUEST_SUCCESS:
                         // Since the request is successful, It is necessary to execute next
-                        // the descending Request.
+                        // the descending Ticket.
                         requestOrder.addAll(request.getDependentRequests());
                         break;
                     case Request.EXECUTION_REQUEST_ERROR:

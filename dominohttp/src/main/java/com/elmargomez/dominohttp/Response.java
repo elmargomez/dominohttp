@@ -14,25 +14,13 @@
  * limitations under the License.
  */
 
-package testonly;
+package com.elmargomez.dominohttp;
 
-/**
- * Created by deadlydragon00 on 4/15/16.
- */
-public interface CacheBank {
+import java.util.Map;
 
-    void init();
+public class Response {
 
-    void put(String key, CacheContent cacheContent);
-
-    CacheContent get(String key);
-
-    interface CacheContent {
-
-        boolean isExpired();
-
-        boolean needsRefresh();
-    }
+    public Map<String, String> header;
 
 
 }

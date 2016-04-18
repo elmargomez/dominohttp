@@ -19,7 +19,7 @@ package com.elmargomez.dominohttp.listener;
 import com.elmargomez.dominohttp.request.Request;
 
 /**
- * Request Success Listener
+ * Ticket Success Listener
  *
  * @param <T>
  */
