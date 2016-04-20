@@ -16,10 +16,30 @@
 
 package com.elmargomez.dominohttp;
 
+import com.elmargomez.dominohttp.request.Request;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Map;
 
-public class Response {
+public class Network {
 
-    public Map<String, String> header;
+
+    public Response getNetworkResponse(Request request) {
+        Response response = new Response();
+
+        return response;
+    }
+
+    public HttpURLConnection openConnection(String url) throws IOException {
+        return (HttpURLConnection) new URL(url).openConnection();
+    }
+
+
+    public class Response {
+        public Map<String, String> header;
+        public byte[] data;
+    }
 
 }

@@ -16,10 +16,7 @@
 
 package com.elmargomez.dominohttp;
 
-import java.util.Map;
+public class Request2 {
 
-public class Response {
-
-    public Map<String, String> header;
 
 }
