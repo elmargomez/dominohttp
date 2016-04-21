@@ -16,19 +16,49 @@
 
 package com.elmargomez.dominohttp;
 
-import com.elmargomez.dominohttp.request.Request;
-
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Network {
 
-
-    public Response getNetworkResponse(Request request) {
+    public Response getNetworkResponse(Request2 request) {
         Response response = new Response();
 
+        OutputStream outputStream = null;
+        try {
+            HttpURLConnection con = openConnection(request.url);
+            con.setRequestMethod(request.method);
+            HashMap<String, String> allHeaders = new HashMap<>();
+            allHeaders.putAll(request.header);
+            for (String i : allHeaders.keySet()) {
+                con.setRequestProperty(i, allHeaders.get(i));
+            }
+            byte[] data = request.getByteData();
+            outputStream = con.getOutputStream();
+            outputStream.write(data, 0, data.length);
+            outputStream.flush();
+
+            response.serverData = getBytes(con.getInputStream());
+            response.responseCode = con.getResponseCode();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
         return response;
     }
 
@@ -36,10 +66,48 @@ public class Network {
         return (HttpURLConnection) new URL(url).openConnection();
     }
 
+    public static byte[] getBytes(InputStream stream) {
+        ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int read;
+        try {
+            while (-1 != (read = stream.read(buffer))) {
+                byteArray.write(buffer, 0, read);
+            }
+            byteArray.flush();
+            buffer = byteArray.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                stream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                byteArray.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return buffer;
+    }
 
     public class Response {
-        public Map<String, String> header;
-        public byte[] data;
+        public Map<String, String> header = Collections.emptyMap();
+        public byte[] serverData;
+        public int responseCode;
+        public long ttl;
+        public long softTTL;
+
+        public boolean isExpired() {
+            return ttl < System.currentTimeMillis();
+        }
+
+        public boolean mustRefresh() {
+            return softTTL < System.currentTimeMillis();
+        }
+
     }
 
 }
