@@ -21,12 +21,12 @@ import com.elmargomez.dominohttp.request.Request;
 
 import java.util.concurrent.PriorityBlockingQueue;
 
-public class RequestDispatcher extends Thread {
+public class NetworkDispatcher extends Thread {
 
     private boolean shouldStop;
     private PriorityBlockingQueue<Request> requestOrder;
 
-    public RequestDispatcher(PriorityBlockingQueue order) {
+    public NetworkDispatcher(PriorityBlockingQueue order) {
         this.requestOrder = order;
     }
 

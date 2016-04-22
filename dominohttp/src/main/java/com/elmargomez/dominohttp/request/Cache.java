@@ -14,12 +14,25 @@
  * limitations under the License.
  */
 
-package com.elmargomez.dominohttp;
+package com.elmargomez.dominohttp.request;
 
-public class ContentType {
+import com.elmargomez.dominohttp.Request;
 
-    public static final String APPLICATION_JSON = "application/json";
-    public static final String TEXT_PLAIN = "text/plain";
-    public static final String IMAGE_JPEG = "image/jpeg";
+import java.util.Map;
+
+public interface Cache {
+
+    int size = 0;
+
+    void put(Request request);
+
+    Data get(String cacheKey);
+
+    class Data {
+        Map<String, String> header;
+        byte[] data;
+        long ttl;
+        long softTTL;
+    }
 
 }

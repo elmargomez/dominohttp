@@ -16,28 +16,55 @@
 
 package com.elmargomez.dominohttp;
 
-import com.elmargomez.dominohttp.request.Request;
+import com.elmargomez.dominohttp.request.Cache;
 
+import java.util.ArrayList;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class RequestQueue {
     private static final int MIN_REQUEST_DISPATCHER_COUNT = 4;
 
+    private final ArrayList<String> requestLog = new ArrayList<>();
+    private final PriorityBlockingQueue<Request> networkRequest = new PriorityBlockingQueue<>();
+    private final PriorityBlockingQueue<Request> cachedRequest = new PriorityBlockingQueue<>();
     private boolean isRunning;
-    private RequestDispatcher[] dispatchers;
-    private PriorityBlockingQueue<Request> requestsQueue = null;
 
-    public RequestQueue(int dispatcherCount) {
-        requestsQueue = new PriorityBlockingQueue();
-        this.dispatchers = new RequestDispatcher[dispatcherCount];
+    private Cache cache = null;
+    private Network network = null;
+    private NetworkDispatcher[] dispatchers;
+    private ResponseSender sender;
+
+    public RequestQueue(Network network, Cache cache, int dispatcherCount) {
+        this.network = network;
+        this.cache = cache;
+        this.dispatchers = new NetworkDispatcher[dispatcherCount];
+        this.sender = new ResponseSender();
     }
 
     public RequestQueue() {
-        this(MIN_REQUEST_DISPATCHER_COUNT);
+        this(null, null, MIN_REQUEST_DISPATCHER_COUNT);
     }
 
     public void add(Request request) {
-        requestsQueue.add(request);
+        synchronized (requestLog) {
+            String key = request.getRequestKey();
+
+            // Check if this request was already here.
+            if (requestLog.contains(request.getRequestKey())) {
+                // This request was processed before, but we need to decided
+                // on what to do with it.
+                if (request.hasCached()) {
+
+                } else {
+
+                }
+            } else {
+                // Since this request is not yet requested before,
+                // we are going to put directly to the request Queue.
+                requestLog.add(key);
+                cachedRequest.add(request);
+            }
+        }
     }
 
     public void remove(Request request) {
@@ -51,7 +78,7 @@ public class RequestQueue {
         isRunning = true;
         int c = dispatchers.length;
         for (int i = 0; i < c; i++) {
-            dispatchers[i] = new RequestDispatcher(requestsQueue);
+            dispatchers[i] = new NetworkDispatcher(networkRequest);
             dispatchers[i].start();
         }
     }

@@ -16,10 +16,10 @@
 
 package com.elmargomez.dominohttp;
 
-public class Method {
+public class CacheDispatcher extends Thread {
 
-    public static final String GET = "GET";
-    public static final String PUT = "PUT";
-    public static final String POST = "POST";
+    @Override
+    public void run() {
 
+    }
 }

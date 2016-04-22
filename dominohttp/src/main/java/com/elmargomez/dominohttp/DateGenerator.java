@@ -16,24 +16,41 @@
 
 package com.elmargomez.dominohttp;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
-public class KeyGenerator {
+public class DateGenerator {
 
     private static final String TIME_FORMAT = "HH:mm:ss-yyyy-MM-dd";
-    private static KeyGenerator generator = new KeyGenerator();
+    private static final String RFC_1123_FORMAT = "EEE, dd MMM yyyy HH:mm:ss z";
+    private static DateGenerator generator = new DateGenerator();
     private SimpleDateFormat format;
+    private SimpleDateFormat format2;
 
-    private KeyGenerator() {
+    private DateGenerator() {
         format = new SimpleDateFormat(TIME_FORMAT);
+        format2 = new SimpleDateFormat(RFC_1123_FORMAT);
     }
 
-    public static KeyGenerator getGenerator() {
+    public static DateGenerator getGenerator() {
         return generator;
     }
 
-    public String getKey() {
+    public String getTime() {
         return format.format(new Date());
+    }
+
+    public long getEpoch(String rfc_date) {
+        try {
+            format2.setTimeZone(TimeZone.getTimeZone("GMT"));
+            Date d = format2.parse(rfc_date);
+            format2.setTimeZone(TimeZone.getDefault());
+            String sDate = format2.format(d);
+            return format2.parse(sDate).getTime();
+        } catch (ParseException e) {
+            return 0;
+        }
     }
 }

@@ -16,7 +16,6 @@
 
 package com.elmargomez.dominohttp.request;
 
-import com.elmargomez.dominohttp.ContentType;
 import com.elmargomez.dominohttp.listener.FailedListener;
 import com.elmargomez.dominohttp.listener.SuccessListener;
 
@@ -78,8 +77,7 @@ public class JSONRequest extends Request {
 
             if (jsonBody != null) {
                 outputStream = connection.getOutputStream();
-                buffWriter = new BufferedWriter(new OutputStreamWriter(outputStream,
-                        "UTF-8"));
+                buffWriter = new BufferedWriter(new OutputStreamWriter(outputStream,"UTF-8"));
                 buffWriter.write(jsonBody);
                 buffWriter.flush();
             }

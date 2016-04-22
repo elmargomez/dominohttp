@@ -16,7 +16,7 @@
 
 package com.elmargomez.dominohttp.r2;
 
-import com.elmargomez.dominohttp.Request2;
+import com.elmargomez.dominohttp.Request;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -26,7 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class UploadImageRequest extends Request2<File> {
+public class UploadImageRequest extends Request<File> {
 
     public UploadImageRequest(Success successListener, Failed failedListener) {
         super(successListener, failedListener);

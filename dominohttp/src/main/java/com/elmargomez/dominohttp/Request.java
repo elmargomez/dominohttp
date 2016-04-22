@@ -24,7 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Request2<I> {
+public abstract class Request<I> {
     public static final String GET = "GET";
     public static final String PUT = "PUT";
     public static final String POST = "POST";
@@ -48,44 +48,90 @@ public abstract class Request2<I> {
     private Success successListener;
     private Failed failedListener;
 
-    public String url;
-    public String method;
-    public Map<String, String> header = new HashMap<>();
-    String requestKey;
+    private String requestKey;
+    private String url;
+    private String method;
+    private String contentType;
+    private final HashMap<String, String> header = new HashMap<>();
     protected byte[] data;
     private I input;
 
-    public Request2(Success successListener, Failed failedListener) {
+    private boolean hasCached;
+
+    public Request(Success successListener, Failed failedListener) {
         this.successListener = successListener;
         this.failedListener = failedListener;
-        this.requestKey = KeyGenerator.getGenerator().getKey();
     }
 
     public void setURL(@NonNull String url) {
         this.url = url;
     }
 
+    public String getURL() {
+        return url;
+    }
+
     public void setMethod(@NonNull @Method String method) {
         this.method = method;
     }
 
-    public void addContentType(@NonNull @ContentType String ct) {
-        header.put("Content-Type", ct);
+    public String getMethod() {
+        return method;
     }
 
-    public void setHeader(Map<String, String> s) {
+    public void setContentType(@NonNull @ContentType String ct) {
+        this.contentType = ct;
+    }
+
+    public String getContentType() {
+        return this.contentType;
+    }
+
+    public String getRequestKey() {
+        if (requestKey == null) {
+            StringBuilder builder = new StringBuilder();
+            builder.append(url);
+            for (String key : header.keySet()) {
+                builder.append(key);
+                builder.append(header.get(key));
+            }
+            if (data != null) {
+                builder.append(data.length);
+            }
+            requestKey = builder.toString();
+        }
+        return requestKey;
+    }
+
+    public void addHeaders(Map<String, String> s) {
         header.putAll(s);
     }
 
-    public abstract byte[] getByteData();
+    public void addHeader(String key, String val) {
+        header.put(key, val);
+    }
 
-    public I getBody() {
+    public Map<String, String> getHeaders() {
+        return header;
+    }
+
+    public void isCached(boolean v) {
+        hasCached = v;
+    }
+
+    public boolean hasCached() {
+        return hasCached;
+    }
+
+    protected I getBody() {
         return input;
     }
 
     public void setBody(I i) {
         this.input = i;
     }
+
+    public abstract byte[] getByteData();
 
     public interface Success<T> {
 

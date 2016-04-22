@@ -16,14 +16,11 @@
 
 package com.elmargomez.dominohttp;
 
-import com.elmargomez.dominohttp.request.Request;
-
 public class Domino {
 
     private RequestQueue requestQueue;
 
     private Domino() {
-
 
         requestQueue = new RequestQueue();
     }

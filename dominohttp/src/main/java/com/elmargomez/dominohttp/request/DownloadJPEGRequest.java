@@ -18,7 +18,6 @@ package com.elmargomez.dominohttp.request;
 
 import android.graphics.BitmapFactory;
 
-import com.elmargomez.dominohttp.ContentType;
 import com.elmargomez.dominohttp.listener.FailedListener;
 import com.elmargomez.dominohttp.listener.SuccessListener;
 
