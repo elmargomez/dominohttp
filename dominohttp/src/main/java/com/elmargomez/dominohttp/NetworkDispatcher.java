@@ -17,60 +17,53 @@
 package com.elmargomez.dominohttp;
 
 import com.elmargomez.dominohttp.listener.OnExceptionListener;
-import com.elmargomez.dominohttp.request.Request;
+import com.elmargomez.dominohttp.request.Cache;
 
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class NetworkDispatcher extends Thread {
 
-    private boolean shouldStop;
-    private PriorityBlockingQueue<Request> requestOrder;
+    private BlockingQueue<Request> networkRequest;
+    private Cache cache;
+    private ResponseSender responseSender;
+    private Network network;
 
-    public NetworkDispatcher(PriorityBlockingQueue order) {
-        this.requestOrder = order;
+    private boolean isInterrupted;
+
+    public NetworkDispatcher(BlockingQueue<Request> networkRequest, Cache cache, Network network,
+                             ResponseSender responseSender) {
+        this.networkRequest = networkRequest;
+        this.cache = cache;
+        this.network = network;
+        this.responseSender = responseSender;
     }
+
 
     @Override
     public void run() {
         while (true) {
+            Request request = null;
             try {
-                Request request = requestOrder.take();
-                int req = request.executed();
-                switch (req) {
-                    case Request.EXECUTION_REQUEST_SUCCESS:
-                        // Since the request is successful, It is necessary to execute next
-                        // the descending Ticket.
-                        requestOrder.addAll(request.getDependentRequests());
-                        break;
-                    case Request.EXECUTION_REQUEST_ERROR:
-                        // TODO addHeader something later
-                        break;
-                    case Request.EXECUTION_FAILURE_ON_DEPLOY:
-                        if (request.canRetry()) {
-                            // While the request fails, let us addHeader it again to the queue
-                            // until the retry count reached to 0.
-                            request.decrementRetryCount();
-                            requestOrder.add(request);
-                        } else {
-                            // Since the request error reached zero lets now fire the callback,
-                            // all the other descending request will be dropped.
-                            OnExceptionListener listener = request.getInternalFailedListener();
-                            if (listener != null) {
-                                listener.response(request);
-                            }
-                        }
-                        break;
-                }
+                request = networkRequest.take();
             } catch (InterruptedException e) {
-                if (shouldStop) {
+                if (isInterrupted) {
                     return;
                 }
             }
+
+            if (request.isCanceled()) {
+                // We need to skip this request.
+                continue;
+            }
+
+            Network.Response networkResponse = network.getNetworkResponse(request);
+
         }
     }
 
     public void close() {
-        shouldStop = true;
+        isInterrupted = true;
         interrupt();
     }
 

@@ -16,10 +16,60 @@
 
 package com.elmargomez.dominohttp;
 
+import com.elmargomez.dominohttp.request.Cache;
+
+import java.util.concurrent.BlockingQueue;
+
 public class CacheDispatcher extends Thread {
+
+    private BlockingQueue<Request> networkRequest;
+    private BlockingQueue<Request> cachedRequest;
+    private Cache cache;
+    private ResponseSender responseSender;
+
+    private boolean isInterrupted;
+
+    public CacheDispatcher(BlockingQueue<Request> networkRequest,
+                           BlockingQueue<Request> cachedRequest, Cache cache,
+                           ResponseSender responseSender) {
+        this.networkRequest = networkRequest;
+        this.cachedRequest = cachedRequest;
+        this.cache = cache;
+        this.responseSender = responseSender;
+    }
 
     @Override
     public void run() {
+        while (true) {
+            Request request = null;
+            try {
+                request = cachedRequest.take();
+            } catch (InterruptedException e) {
+                if (isInterrupted) {
+                    break;
+                }
+            }
 
+            if (request.isCanceled()) {
+                // We need to skip this request.
+                continue;
+            }
+
+            Cache.Data data = cache.get(request.getRequestKey());
+            if (data == null || data.isExpired()) {
+                networkRequest.add(request);
+                continue;
+            }
+
+            responseSender.success(request, data.data);
+            if (data.needsRefresh()) {
+                networkRequest.add(request);
+            }
+        }
+    }
+
+    public void cancel() {
+        isInterrupted = true;
+        interrupt();
     }
 }

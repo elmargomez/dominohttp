@@ -24,7 +24,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Request<I> {
+/**
+ * The http request.
+ *
+ * @param <I> is the specific body Data.
+ * @param <R> is the success listener Object.
+ */
+public abstract class Request<I, R> {
     public static final String GET = "GET";
     public static final String PUT = "PUT";
     public static final String POST = "POST";
@@ -45,8 +51,8 @@ public abstract class Request<I> {
 
     }
 
-    private Success successListener;
-    private Failed failedListener;
+    private SuccessListener<R> successListener;
+    private FailedListeners failedListenersListener;
 
     private String requestKey;
     private String url;
@@ -56,11 +62,12 @@ public abstract class Request<I> {
     protected byte[] data;
     private I input;
 
-    private boolean hasCached;
+    private boolean isCached;
+    private boolean isCanceled;
 
-    public Request(Success successListener, Failed failedListener) {
+    public Request(SuccessListener<R> successListener, FailedListeners failedListenersListener) {
         this.successListener = successListener;
-        this.failedListener = failedListener;
+        this.failedListenersListener = failedListenersListener;
     }
 
     public void setURL(@NonNull String url) {
@@ -115,12 +122,20 @@ public abstract class Request<I> {
         return header;
     }
 
-    public void isCached(boolean v) {
-        hasCached = v;
+    public void setCached(boolean v) {
+        isCached = v;
     }
 
-    public boolean hasCached() {
-        return hasCached;
+    public boolean isCached() {
+        return isCached;
+    }
+
+    public void setCanceled(boolean v) {
+        isCanceled = v;
+    }
+
+    public boolean isCanceled() {
+        return isCanceled;
     }
 
     protected I getBody() {
@@ -133,11 +148,33 @@ public abstract class Request<I> {
 
     public abstract byte[] getByteData();
 
-    public interface Success<T> {
+    public abstract R generateResponse(byte[] b);
+
+    public SuccessListener getSuccessListener() {
+        return successListener;
+    }
+
+    public FailedListeners getErrorListener() {
+        return failedListenersListener;
+    }
+
+    /**
+     * The Success Listener for the Current Request.
+     *
+     * @param <T>
+     */
+    public interface SuccessListener<T> {
+
+        void response(T t);
 
     }
 
-    public interface Failed {
+    /**
+     * The Failed Listener for the Current Request.
+     */
+    public interface FailedListeners {
+
+        void error();
 
     }
 

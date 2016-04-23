@@ -26,10 +26,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class UploadImageRequest extends Request<File> {
+public class UploadImageRequest extends Request<File, String> {
 
-    public UploadImageRequest(Success successListener, Failed failedListener) {
-        super(successListener, failedListener);
+    public UploadImageRequest(SuccessListener<String> successListenerListener,
+                              FailedListeners failedListenersListener) {
+        super(successListenerListener, failedListenersListener);
+        setContentType(IMAGE_JPEG);
     }
 
     @Override
@@ -63,4 +65,11 @@ public class UploadImageRequest extends Request<File> {
         }
         return data;
     }
+
+    @Override
+    public String generateResponse(byte[] b) {
+        return new String(b);
+    }
+
+
 }

@@ -53,7 +53,7 @@ public class RequestQueue {
             if (requestLog.contains(request.getRequestKey())) {
                 // This request was processed before, but we need to decided
                 // on what to do with it.
-                if (request.hasCached()) {
+                if (request.isCached()) {
 
                 } else {
 

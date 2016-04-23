@@ -19,7 +19,7 @@ package com.elmargomez.dominohttp;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.elmargomez.dominohttp.request.Request;
+import com.elmargomez.dominohttp.listener.SuccessListener;
 
 public class ResponseSender {
     private Handler handler = null;
@@ -32,20 +32,27 @@ public class ResponseSender {
         this(new Handler(Looper.getMainLooper()));
     }
 
-    public void success(Request request, Response response) {
+    public void success(final Request request, byte[] response) {
+        final Object p = request.generateResponse(response);
         handler.post(new Runnable() {
             @Override
             public void run() {
-
+                Request.SuccessListener successListener = request.getSuccessListener();
+                if (successListener != null) {
+                    successListener.response(p);
+                }
             }
         });
     }
 
-    public void failure(Request request, Response response) {
+    public void failure(final Request request) {
         handler.post(new Runnable() {
             @Override
             public void run() {
-
+                Request.FailedListeners errorListener = request.getErrorListener();
+                if (errorListener != null) {
+                    errorListener.error();
+                }
             }
         });
     }

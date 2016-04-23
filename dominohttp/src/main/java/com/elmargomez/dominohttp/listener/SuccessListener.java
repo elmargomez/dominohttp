@@ -16,10 +16,8 @@
 
 package com.elmargomez.dominohttp.listener;
 
-import com.elmargomez.dominohttp.request.Request;
-
 /**
- * Ticket Success Listener
+ * Ticket SuccessListener Listener
  *
  * @param <T>
  */

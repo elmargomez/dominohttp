@@ -16,8 +16,6 @@
 
 package com.elmargomez.dominohttp.listener;
 
-import com.elmargomez.dominohttp.request.Request;
-
 public interface FailedListener {
 
     void response(Request request, int statusCode);

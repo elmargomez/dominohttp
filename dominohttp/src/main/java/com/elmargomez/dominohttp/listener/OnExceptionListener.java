@@ -16,8 +16,6 @@
 
 package com.elmargomez.dominohttp.listener;
 
-import com.elmargomez.dominohttp.request.Request;
-
 /**
  * A Failure Listener
  */

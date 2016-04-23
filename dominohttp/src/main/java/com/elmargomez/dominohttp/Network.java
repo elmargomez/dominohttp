@@ -65,6 +65,7 @@ public class Network {
             }
 
             // parse the data
+            response.setHeader(allHeaders);
             response.serverData = getBytes(con.getInputStream());
             response.responseCode = con.getResponseCode();
 
@@ -86,91 +87,6 @@ public class Network {
         return (HttpURLConnection) new URL(url).openConnection();
     }
 
-    // parse the network response
-    public static String getData(Response response) {
-        long now = System.currentTimeMillis();
-
-        Map<String, String> headers = response.header;
-
-        long serverDate = 0;
-        long lastModified = 0;
-        long serverExpires = 0;
-        long softExpire = 0;
-        long finalExpire = 0;
-        long maxAge = 0;
-        long staleWhileRevalidate = 0;
-        boolean hasCacheControl = false;
-        boolean mustRevalidate = false;
-
-        String serverEtag = null;
-        String headerValue;
-
-        headerValue = headers.get("Date");
-        if (headerValue != null) {
-            serverDate = DateGenerator.getGenerator().getEpoch(headerValue);
-        }
-
-        headerValue = headers.get("Cache-Control");
-        if (headerValue != null) {
-            hasCacheControl = true;
-            String[] tokens = headerValue.split(",");
-            for (int i = 0; i < tokens.length; i++) {
-                String token = tokens[i].trim();
-                if (token.equals("no-cache") || token.equals("no-store")) {
-                    return null;
-                } else if (token.startsWith("max-age=")) {
-                    try {
-                        maxAge = Long.parseLong(token.substring(8));
-                    } catch (Exception e) {
-                    }
-                } else if (token.startsWith("stale-while-revalidate=")) {
-                    try {
-                        staleWhileRevalidate = Long.parseLong(token.substring(23));
-                    } catch (Exception e) {
-                    }
-                } else if (token.equals("must-revalidate") || token.equals("proxy-revalidate")) {
-                    mustRevalidate = true;
-                }
-
-                // stale-while-revalidate and must-ravl,proxy-reval will not come together.
-            }
-        }
-
-        headerValue = headers.get("Expires");
-        if (headerValue != null) {
-            serverExpires = DateGenerator.getGenerator().getEpoch(headerValue);
-        }
-
-        headerValue = headers.get("Last-Modified");
-        if (headerValue != null) {
-            lastModified = DateGenerator.getGenerator().getEpoch(headerValue);
-        }
-
-        serverEtag = headers.get("ETag");
-
-        // Cache-Control takes precedence over an Expires header, even if both exist and Expires
-        // is more restrictive.
-        if (hasCacheControl) {
-            softExpire = now + maxAge * 1000; // get time that our cache expires in millisecond.
-            finalExpire = mustRevalidate
-                    ? softExpire : softExpire + staleWhileRevalidate * 1000;
-        } else if (serverDate > 0 && serverExpires >= serverDate) {
-            // Default semantic for Expire header in HTTP specification is softExpire.
-            softExpire = now + (serverExpires - serverDate);
-            finalExpire = softExpire;
-        }
-
-//
-//        Cache.Entry entry = new Cache.Entry();
-//        entry.data = response.data;
-//        entry.softTtl = softExpire;
-//        entry.ttl = finalExpire;
-//        entry.serverDate = serverDate;
-//        entry.lastModified = lastModified;
-//        entry.responseHeaders = headers;
-//
-//        return entry;
-    }
 
     public static byte[] getBytes(InputStream stream) {
         ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
@@ -205,6 +121,75 @@ public class Network {
         public int responseCode;
         public long ttl;
         public long softTTL;
+
+        // parse the network response
+        public void setHeader(HashMap<String, String> headers) {
+            this.header.putAll(headers);
+            long now = System.currentTimeMillis();
+
+            long serverDate = 0;
+            long serverExpires = 0;
+            long softExpire = 0;
+            long finalExpire = 0;
+            long maxAge = 0;
+            long staleWhileRevalidate = 0;
+            boolean hasCacheControl = false;
+            boolean mustRevalidate = false;
+
+            String headerValue;
+
+            headerValue = headers.get("Date");
+            if (headerValue != null) {
+                serverDate = DateGenerator.getGenerator().getEpoch(headerValue);
+            }
+
+            headerValue = headers.get("Cache-Control");
+            if (headerValue != null) {
+                hasCacheControl = true;
+                String[] tokens = headerValue.split(",");
+                for (int i = 0; i < tokens.length; i++) {
+                    String token = tokens[i].trim();
+                    if (token.equals("no-cache") || token.equals("no-store")) {
+                        return;
+                    } else if (token.startsWith("max-age=")) {
+                        try {
+                            maxAge = Long.parseLong(token.substring(8));
+                        } catch (Exception e) {
+                        }
+                    } else if (token.startsWith("stale-while-revalidate=")) {
+                        try {
+                            staleWhileRevalidate = Long.parseLong(token.substring(23));
+                        } catch (Exception e) {
+                        }
+                    } else if (token.equals("must-revalidate") || token.equals("proxy-revalidate")) {
+                        mustRevalidate = true;
+                    }
+
+                    // stale-while-revalidate and must-ravl,proxy-reval will not come together.
+                }
+            }
+
+            headerValue = headers.get("Expires");
+            if (headerValue != null) {
+                serverExpires = DateGenerator.getGenerator().getEpoch(headerValue);
+            }
+
+
+            // Cache-Control takes precedence over an Expires header, even if both exist and Expires
+            // is more restrictive.
+            if (hasCacheControl) {
+                softExpire = now + maxAge * 1000; // get time that our cache expires in millisecond.
+                finalExpire = mustRevalidate
+                        ? softExpire : softExpire + staleWhileRevalidate * 1000;
+            } else if (serverDate > 0 && serverExpires >= serverDate) {
+                // Default semantic for Expire header in HTTP specification is softExpire.
+                softExpire = now + (serverExpires - serverDate);
+                finalExpire = softExpire;
+            }
+
+            softTTL = softExpire;
+            ttl = finalExpire;
+        }
 
         public boolean isExpired() {
             return ttl < System.currentTimeMillis();

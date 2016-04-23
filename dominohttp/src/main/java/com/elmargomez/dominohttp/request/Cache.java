@@ -30,9 +30,17 @@ public interface Cache {
 
     class Data {
         Map<String, String> header;
-        byte[] data;
+        public byte[] data;
         long ttl;
         long softTTL;
+
+        public boolean isExpired() {
+            return ttl < System.currentTimeMillis();
+        }
+
+        public boolean needsRefresh() {
+            return softTTL < System.currentTimeMillis();
+        }
     }
 
 }
