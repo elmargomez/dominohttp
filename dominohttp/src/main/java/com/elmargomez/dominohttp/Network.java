@@ -28,7 +28,7 @@ import java.util.Map;
 
 public class Network {
 
-    public Response getNetworkResponse(Request request) {
+    public Response getNetworkResponse(Request request) throws IOException {
         Response response = new Response();
 
         OutputStream outputStream = null;
@@ -70,7 +70,7 @@ public class Network {
             response.responseCode = con.getResponseCode();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IOException();
         } finally {
             if (outputStream != null) {
                 try {
@@ -174,7 +174,6 @@ public class Network {
                 serverExpires = DateGenerator.getGenerator().getEpoch(headerValue);
             }
 
-
             // Cache-Control takes precedence over an Expires header, even if both exist and Expires
             // is more restrictive.
             if (hasCacheControl) {
@@ -189,14 +188,6 @@ public class Network {
 
             softTTL = softExpire;
             ttl = finalExpire;
-        }
-
-        public boolean isExpired() {
-            return ttl < System.currentTimeMillis();
-        }
-
-        public boolean mustRefresh() {
-            return softTTL < System.currentTimeMillis();
         }
     }
 }

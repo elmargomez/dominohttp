@@ -19,6 +19,7 @@ package com.elmargomez.dominohttp;
 import com.elmargomez.dominohttp.listener.OnExceptionListener;
 import com.elmargomez.dominohttp.request.Cache;
 
+import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -57,7 +58,36 @@ public class NetworkDispatcher extends Thread {
                 continue;
             }
 
-            Network.Response networkResponse = network.getNetworkResponse(request);
+            try {
+                Network.Response networkResponse = network.getNetworkResponse(request);
+                if (networkResponse.responseCode != 200) {
+                    // If we have retry, lets just add this back to the Queue
+                    int r = request.getRetryCount();
+                    if (r > 0) {
+                        request.decRetryCount();
+                        networkRequest.add(request);
+                    } else {
+                        responseSender.failure(request);
+                    }
+                    continue;
+                }
+
+                if (request.shouldCached()) {
+                    Cache.Data data = new Cache.Data(networkResponse);
+                    cache.put(request.getRequestKey(), data);
+                }
+
+                responseSender.success(request, networkResponse.serverData);
+
+            } catch (IOException e) {
+                int r = request.getRetryCount();
+                if (r > 0) {
+                    request.decRetryCount();
+                    networkRequest.add(request);
+                } else {
+                    responseSender.failure(request);
+                }
+            }
 
         }
     }

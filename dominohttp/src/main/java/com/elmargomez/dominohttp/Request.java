@@ -62,7 +62,8 @@ public abstract class Request<I, R> {
     protected byte[] data;
     private I input;
 
-    private boolean isCached;
+    private int retryCount = 1;
+    private boolean shouldCached = true;
     private boolean isCanceled;
 
     public Request(SuccessListener<R> successListener, FailedListeners failedListenersListener) {
@@ -122,12 +123,12 @@ public abstract class Request<I, R> {
         return header;
     }
 
-    public void setCached(boolean v) {
-        isCached = v;
+    public void setShouldCached(boolean v) {
+        shouldCached = v;
     }
 
-    public boolean isCached() {
-        return isCached;
+    public boolean shouldCached() {
+        return shouldCached;
     }
 
     public void setCanceled(boolean v) {
@@ -136,6 +137,18 @@ public abstract class Request<I, R> {
 
     public boolean isCanceled() {
         return isCanceled;
+    }
+
+    public void setRetryCount(int r) {
+        retryCount = r;
+    }
+
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    public void decRetryCount() {
+        retryCount--;
     }
 
     protected I getBody() {

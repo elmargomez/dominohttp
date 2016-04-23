@@ -16,33 +16,19 @@
 
 package com.elmargomez.dominohttp;
 
-public class Domino {
+import com.elmargomez.dominohttp.request.Cache;
 
-    private RequestQueue requestQueue;
+public class LocalCache implements Cache {
 
-    private Domino() {
 
-        requestQueue = new RequestQueue();
+
+    @Override
+    public void put(String key, Data data) {
+
     }
 
-    public static Domino getInstance() {
-        Domino domino = new Domino();
-        domino.start();
-        return domino;
+    @Override
+    public Data get(String cacheKey) {
+        return null;
     }
-
-    private void start() {
-        requestQueue.start();
-    }
-
-    public void stop() {
-        requestQueue.stop();
-    }
-
-    public void add(Request request) {
-        requestQueue.add(request);
-    }
-
-
-
 }

@@ -35,6 +35,13 @@ public class RequestQueue {
     private ResponseSender sender;
 
     public RequestQueue(Network network, Cache cache, int dispatcherCount) {
+
+        if (network == null) {
+            network = new Network();
+        }
+
+
+
         this.network = network;
         this.cache = cache;
         this.dispatchers = new NetworkDispatcher[dispatcherCount];
@@ -42,6 +49,7 @@ public class RequestQueue {
     }
 
     public RequestQueue() {
+
         this(null, null, MIN_REQUEST_DISPATCHER_COUNT);
     }
 
@@ -53,7 +61,7 @@ public class RequestQueue {
             if (requestLog.contains(request.getRequestKey())) {
                 // This request was processed before, but we need to decided
                 // on what to do with it.
-                if (request.isCached()) {
+                if (request.shouldCached()) {
 
                 } else {
 
@@ -78,7 +86,7 @@ public class RequestQueue {
         isRunning = true;
         int c = dispatchers.length;
         for (int i = 0; i < c; i++) {
-            dispatchers[i] = new NetworkDispatcher(networkRequest);
+            dispatchers[i] = new NetworkDispatcher(networkRequest, cache, network, sender);
             dispatchers[i].start();
         }
     }

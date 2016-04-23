@@ -16,6 +16,7 @@
 
 package com.elmargomez.dominohttp.request;
 
+import com.elmargomez.dominohttp.Network;
 import com.elmargomez.dominohttp.Request;
 
 import java.util.Map;
@@ -24,7 +25,7 @@ public interface Cache {
 
     int size = 0;
 
-    void put(Request request);
+    void put(String key, Data data);
 
     Data get(String cacheKey);
 
@@ -33,6 +34,13 @@ public interface Cache {
         public byte[] data;
         long ttl;
         long softTTL;
+
+        public Data(Network.Response networkResponse) {
+            header = networkResponse.header;
+            data = networkResponse.serverData;
+            ttl = networkResponse.ttl;
+            softTTL = networkResponse.softTTL;
+        }
 
         public boolean isExpired() {
             return ttl < System.currentTimeMillis();
