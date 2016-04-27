@@ -45,10 +45,12 @@ public class Network {
             }
 
             // getByte data must be executed in other thread.
-            byte[] data = request.getByteData();
-            outputStream = con.getOutputStream();
-            outputStream.write(data, 0, data.length);
-            outputStream.flush();
+            if (request.getMethod() != "GET") {
+                byte[] data = request.getByteData();
+                outputStream = con.getOutputStream();
+                outputStream.write(data, 0, data.length);
+                outputStream.flush();
+            }
 
             // We are going to reuse the HashMap to avoid Object creation.
             // The response header will be loaded in this HashMap.
@@ -87,7 +89,6 @@ public class Network {
         return (HttpURLConnection) new URL(url).openConnection();
     }
 
-
     public static byte[] getBytes(InputStream stream) {
         ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
@@ -116,7 +117,7 @@ public class Network {
     }
 
     public class Response {
-        public Map<String, String> header = Collections.emptyMap();
+        public Map<String, String> header = new HashMap<>();
         public byte[] serverData;
         public int responseCode;
         public long ttl;

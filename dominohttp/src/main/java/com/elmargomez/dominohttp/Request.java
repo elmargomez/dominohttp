@@ -21,6 +21,7 @@ import android.support.annotation.StringDef;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +31,7 @@ import java.util.Map;
  * @param <I> is the specific body Data.
  * @param <R> is the success listener Object.
  */
-public abstract class Request<I, R> {
+public abstract class Request<I, R> implements Comparable{
     public static final String GET = "GET";
     public static final String PUT = "PUT";
     public static final String POST = "POST";

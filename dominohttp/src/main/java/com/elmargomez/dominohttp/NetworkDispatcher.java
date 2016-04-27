@@ -16,12 +16,10 @@
 
 package com.elmargomez.dominohttp;
 
-import com.elmargomez.dominohttp.listener.OnExceptionListener;
 import com.elmargomez.dominohttp.request.Cache;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
 
 public class NetworkDispatcher extends Thread {
 
@@ -43,6 +41,7 @@ public class NetworkDispatcher extends Thread {
 
     @Override
     public void run() {
+        cache.initialize();
         while (true) {
             Request request = null;
             try {

@@ -23,17 +23,23 @@ import java.util.Map;
 
 public interface Cache {
 
-    int size = 0;
-
     void put(String key, Data data);
 
     Data get(String cacheKey);
 
+    void remove(String k);
+
+    void initialize();
+
     class Data {
-        Map<String, String> header;
+        public Map<String, String> header;
+        public long ttl;
+        public long softTTL;
         public byte[] data;
-        long ttl;
-        long softTTL;
+
+        public Data(){
+
+        }
 
         public Data(Network.Response networkResponse) {
             header = networkResponse.header;

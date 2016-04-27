@@ -40,6 +40,7 @@ public class CacheDispatcher extends Thread {
 
     @Override
     public void run() {
+        cache.initialize();
         while (true) {
             Request request = null;
             try {

@@ -19,8 +19,6 @@ package com.elmargomez.dominohttp;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.elmargomez.dominohttp.listener.SuccessListener;
-
 public class ResponseSender {
     private Handler handler = null;
 

@@ -71,5 +71,8 @@ public class UploadImageRequest extends Request<File, String> {
         return new String(b);
     }
 
-
+    @Override
+    public int compareTo(Object another) {
+        return 0;
+    }
 }

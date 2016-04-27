@@ -16,17 +16,24 @@
 
 package com.elmargomez.dominohttp;
 
-public class Domino {
+import android.content.Context;
 
+import java.io.File;
+
+public class Domino {
+    private static Domino domino;
     private RequestQueue requestQueue;
 
-    private Domino() {
-
-        requestQueue = new RequestQueue();
+    private Domino(Context context) {
+        File cFile = new File(context.getCacheDir(), "Fcache");
+        FileCache cache = new FileCache(cFile);
+        requestQueue = new RequestQueue(cache);
     }
 
-    public static Domino getInstance() {
-        Domino domino = new Domino();
+    public static Domino getInstance(Context context) {
+        if (domino == null)
+            domino = new Domino(context);
+
         domino.start();
         return domino;
     }
@@ -43,6 +50,8 @@ public class Domino {
         requestQueue.add(request);
     }
 
-
+    public void remove(Request request) {
+        requestQueue.remove(request);
+    }
 
 }
