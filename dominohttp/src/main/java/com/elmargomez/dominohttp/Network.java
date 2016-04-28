@@ -16,13 +16,14 @@
 
 package com.elmargomez.dominohttp;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,21 +32,28 @@ public class Network {
     public Response getNetworkResponse(Request request) throws IOException {
         Response response = new Response();
 
+        InputStream stream = null;
         OutputStream outputStream = null;
+        BufferedReader errorStreamWriter = null;
         try {
+
             HttpURLConnection con = openConnection(request.getURL());
             con.setRequestMethod(request.getMethod());
-
             // All header information combined together.
             HashMap<String, String> allHeaders = new HashMap<>();
             allHeaders.put("Content-Type", request.getContentType());
             allHeaders.putAll(request.getHeaders());
+
             for (String i : allHeaders.keySet()) {
                 con.setRequestProperty(i, allHeaders.get(i));
             }
 
+            if (request.getMethod() == Request.PUT || request.getMethod() == Request.POST) {
+                con.setDoInput(true);
+            }
+
             // getByte data must be executed in other thread.
-            if (request.getMethod() != "GET") {
+            if (request.getMethod() != Request.GET) {
                 byte[] data = request.getByteData();
                 outputStream = con.getOutputStream();
                 outputStream.write(data, 0, data.length);
@@ -58,28 +66,42 @@ public class Network {
             for (int i = 0; ; i++) {
                 String headerKey = con.getHeaderFieldKey(i);
                 String header = con.getHeaderField(i);
-
                 // We have reached the last header, we need to end this loop.
-                if (headerKey == null && header == null)
+                if (headerKey == null && header == null) {
                     break;
+                }
 
                 allHeaders.put(headerKey, header);
             }
 
+            if (con.getResponseCode() != 200) {
+                errorStreamWriter = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+                StringBuilder builder = new StringBuilder();
+                String dummy;
+
+                while ((dummy = errorStreamWriter.readLine()) != null) {
+                    builder.append(dummy);
+                }
+                response.errorMessage = builder.toString();
+            }
+
             // parse the data
             response.setHeader(allHeaders);
-            response.serverData = getBytes(con.getInputStream());
+            stream = con.getInputStream();
+            response.serverData = getBytes(stream);
             response.responseCode = con.getResponseCode();
 
         } catch (IOException e) {
-            throw new IOException();
+            throw e;
         } finally {
+            if (stream != null) {
+                stream.close();
+            }
             if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                outputStream.close();
+            }
+            if (errorStreamWriter != null) {
+                errorStreamWriter.close();
             }
         }
         return response;
@@ -89,28 +111,22 @@ public class Network {
         return (HttpURLConnection) new URL(url).openConnection();
     }
 
-    public static byte[] getBytes(InputStream stream) {
-        ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
+    public static byte[] getBytes(InputStream stream) throws IOException {
+        ByteArrayOutputStream byteArray = null;
         byte[] buffer = new byte[1024];
         int read;
         try {
+            byteArray = new ByteArrayOutputStream();
             while (-1 != (read = stream.read(buffer))) {
                 byteArray.write(buffer, 0, read);
             }
             byteArray.flush();
             buffer = byteArray.toByteArray();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw e;
         } finally {
-            try {
-                stream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
+            if (byteArray != null) {
                 byteArray.close();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
         return buffer;
@@ -122,6 +138,7 @@ public class Network {
         public int responseCode;
         public long ttl;
         public long softTTL;
+        public String errorMessage = "";
 
         // parse the network response
         public void setHeader(HashMap<String, String> headers) {
@@ -190,5 +207,6 @@ public class Network {
             softTTL = softExpire;
             ttl = finalExpire;
         }
+
     }
 }

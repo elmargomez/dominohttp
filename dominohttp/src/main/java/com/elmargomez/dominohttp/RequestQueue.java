@@ -52,6 +52,7 @@ public class RequestQueue {
     public void add(Request request) {
         synchronized (cachedRequest) {
             cachedRequest.add(request);
+            DominoLog.debug("New Request from id: " + request.getRequestKey());
         }
     }
 
@@ -76,6 +77,7 @@ public class RequestQueue {
         }
         cacheDispatcher = new CacheDispatcher(networkRequest, cachedRequest, cache, sender);
         cacheDispatcher.start();
+        DominoLog.debug("Request Queue Started!");
     }
 
     public void stop() {
@@ -88,6 +90,7 @@ public class RequestQueue {
             dispatchers[i].close();
         }
         cacheDispatcher.cancel();
+        DominoLog.debug("Request Queue Stopped!");
     }
 
 }

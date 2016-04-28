@@ -37,19 +37,19 @@ public class ResponseSender {
             public void run() {
                 Request.SuccessListener successListener = request.getSuccessListener();
                 if (successListener != null) {
-                    successListener.response(p);
+                    successListener.response(request, p);
                 }
             }
         });
     }
 
-    public void failure(final Request request) {
+    public void failure(final Request request, final String error) {
         handler.post(new Runnable() {
             @Override
             public void run() {
                 Request.FailedListeners errorListener = request.getErrorListener();
                 if (errorListener != null) {
-                    errorListener.error();
+                    errorListener.error(request, error);
                 }
             }
         });

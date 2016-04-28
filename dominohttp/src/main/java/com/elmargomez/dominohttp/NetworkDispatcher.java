@@ -66,7 +66,7 @@ public class NetworkDispatcher extends Thread {
                         request.decRetryCount();
                         networkRequest.add(request);
                     } else {
-                        responseSender.failure(request);
+                        responseSender.failure(request, "Unable to get response!");
                     }
                     continue;
                 }
@@ -77,17 +77,15 @@ public class NetworkDispatcher extends Thread {
                 }
 
                 responseSender.success(request, networkResponse.serverData);
-
             } catch (IOException e) {
                 int r = request.getRetryCount();
                 if (r > 0) {
                     request.decRetryCount();
                     networkRequest.add(request);
                 } else {
-                    responseSender.failure(request);
+                    responseSender.failure(request, "Exception: " + e.getMessage());
                 }
             }
-
         }
     }
 

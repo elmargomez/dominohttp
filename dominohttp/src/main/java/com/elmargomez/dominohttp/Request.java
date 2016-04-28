@@ -31,7 +31,7 @@ import java.util.Map;
  * @param <I> is the specific body Data.
  * @param <R> is the success listener Object.
  */
-public abstract class Request<I, R> implements Comparable{
+public abstract class Request<I, R> implements Comparable {
     public static final String GET = "GET";
     public static final String PUT = "PUT";
     public static final String POST = "POST";
@@ -100,15 +100,19 @@ public abstract class Request<I, R> implements Comparable{
         if (requestKey == null) {
             StringBuilder builder = new StringBuilder();
             builder.append(url);
+
             for (String key : header.keySet()) {
                 builder.append(key);
                 builder.append(header.get(key));
             }
+
             if (data != null) {
                 builder.append(data.length);
             }
+
             requestKey = builder.toString();
         }
+
         return requestKey;
     }
 
@@ -179,7 +183,7 @@ public abstract class Request<I, R> implements Comparable{
      */
     public interface SuccessListener<T> {
 
-        void response(T t);
+        void response(Request request, T t);
 
     }
 
@@ -188,7 +192,7 @@ public abstract class Request<I, R> implements Comparable{
      */
     public interface FailedListeners {
 
-        void error();
+        void error(Request request, String string);
 
     }
 
