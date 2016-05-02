@@ -25,12 +25,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class DownloadIma extends Request<File, DownloadIma.ImageInfo> {
+public class DownloadImage extends Request<File, DownloadImage.ImageInfo> {
 
     private String filename;
 
-    public DownloadIma(SuccessListener<ImageInfo> successListener,
-                       FailedListeners failedListenersListener) {
+    public DownloadImage(SuccessListener<ImageInfo> successListener,
+                         FailedListeners failedListenersListener) {
         super(successListener, failedListenersListener);
         setContentType(IMAGE_JPEG);
     }

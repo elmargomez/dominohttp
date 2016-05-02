@@ -18,9 +18,9 @@ package com.elmargomez.dominohttp.r2;
 
 import com.elmargomez.dominohttp.Request;
 
-public class JSONr extends Request<String, String> {
+public class JSONRequest extends Request<String, String> {
 
-    public JSONr(SuccessListener<String> successListener, FailedListeners failedListenersListener) {
+    public JSONRequest(SuccessListener<String> successListener, FailedListeners failedListenersListener) {
         super(successListener, failedListenersListener);
         setContentType(APPLICATION_JSON);
     }

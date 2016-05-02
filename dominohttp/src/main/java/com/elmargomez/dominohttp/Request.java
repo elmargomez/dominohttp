@@ -66,6 +66,7 @@ public abstract class Request<I, R> implements Comparable {
     private int retryCount = 1;
     private boolean shouldCached = true;
     private boolean isCanceled;
+    private Object optionalTag;
 
     public Request(SuccessListener<R> successListener, FailedListeners failedListenersListener) {
         this.successListener = successListener;
@@ -167,6 +168,14 @@ public abstract class Request<I, R> implements Comparable {
     public abstract byte[] getByteData();
 
     public abstract R generateResponse(byte[] b);
+
+    public void setTag(Object tag) {
+        optionalTag = tag;
+    }
+
+    public Object getTag() {
+        return optionalTag;
+    }
 
     public SuccessListener getSuccessListener() {
         return successListener;
