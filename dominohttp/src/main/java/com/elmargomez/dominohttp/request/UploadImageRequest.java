@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.elmargomez.dominohttp.r2;
+package com.elmargomez.dominohttp.request;
 
 import com.elmargomez.dominohttp.Request;
 

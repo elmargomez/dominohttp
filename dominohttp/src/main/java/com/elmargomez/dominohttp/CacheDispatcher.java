@@ -16,8 +16,6 @@
 
 package com.elmargomez.dominohttp;
 
-import com.elmargomez.dominohttp.request.Cache;
-
 import java.util.concurrent.BlockingQueue;
 
 public class CacheDispatcher extends Thread {
