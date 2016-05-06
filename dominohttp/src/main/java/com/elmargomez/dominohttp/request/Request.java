@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.elmargomez.dominohttp;
+package com.elmargomez.dominohttp.request;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.StringDef;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 

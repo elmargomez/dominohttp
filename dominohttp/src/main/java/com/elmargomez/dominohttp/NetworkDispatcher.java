@@ -16,6 +16,8 @@
 
 package com.elmargomez.dominohttp;
 
+import com.elmargomez.dominohttp.request.Request;
+
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 

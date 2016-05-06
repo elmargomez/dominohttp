@@ -18,8 +18,6 @@ package com.elmargomez.dominohttp.request;
 
 import android.graphics.BitmapFactory;
 
-import com.elmargomez.dominohttp.Request;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

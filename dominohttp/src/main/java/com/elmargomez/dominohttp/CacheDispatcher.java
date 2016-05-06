@@ -16,6 +16,8 @@
 
 package com.elmargomez.dominohttp;
 
+import com.elmargomez.dominohttp.request.Request;
+
 import java.util.concurrent.BlockingQueue;
 
 public class CacheDispatcher extends Thread {
@@ -43,6 +45,7 @@ public class CacheDispatcher extends Thread {
             Request request = null;
             try {
                 request = cachedRequest.take();
+                DominoLog.debug("New Cache Request [id: " + request.getRequestKey() + "]");
             } catch (InterruptedException e) {
                 if (isInterrupted) {
                     break;

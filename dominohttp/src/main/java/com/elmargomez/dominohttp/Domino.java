@@ -18,6 +18,8 @@ package com.elmargomez.dominohttp;
 
 import android.content.Context;
 
+import com.elmargomez.dominohttp.request.Request;
+
 import java.io.File;
 
 public class Domino {

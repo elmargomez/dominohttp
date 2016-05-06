@@ -16,7 +16,7 @@
 
 package com.elmargomez.dominohttp.request;
 
-import com.elmargomez.dominohttp.Request;
+import com.elmargomez.dominohttp.DominoLog;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -43,7 +43,7 @@ public class UploadImageRequest extends Request<File, String> {
             try {
                 s = new BufferedInputStream(new FileInputStream(getBody()));
                 final byte[] patch = new byte[1024];
-                int bytesRead = 0;
+                int bytesRead;
                 while (-1 != (bytesRead = s.read(patch))) {
                     bStream.write(patch, 0, bytesRead);
                 }

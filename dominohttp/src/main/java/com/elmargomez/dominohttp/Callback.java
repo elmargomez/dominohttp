@@ -19,6 +19,8 @@ package com.elmargomez.dominohttp;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.elmargomez.dominohttp.request.Request;
+
 /**
  * Created by deadlydragon00 on 4/12/16.
  */

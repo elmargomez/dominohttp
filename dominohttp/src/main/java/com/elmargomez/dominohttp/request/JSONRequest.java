@@ -16,8 +16,6 @@
 
 package com.elmargomez.dominohttp.request;
 
-import com.elmargomez.dominohttp.Request;
-
 public class JSONRequest extends Request<String, String> {
 
     public JSONRequest(SuccessListener<String> successListener, FailedListeners failedListenersListener) {

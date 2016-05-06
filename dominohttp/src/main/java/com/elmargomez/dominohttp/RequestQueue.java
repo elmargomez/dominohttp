@@ -16,6 +16,8 @@
 
 package com.elmargomez.dominohttp;
 
+import com.elmargomez.dominohttp.request.Request;
+
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class RequestQueue {
@@ -50,11 +52,11 @@ public class RequestQueue {
     public void add(Request request) {
         synchronized (cachedRequest) {
             cachedRequest.add(request);
-            DominoLog.debug("New Request from id: " + request.getRequestKey());
         }
     }
 
     public synchronized void remove(Request request) {
+        request.setCanceled(true);
         synchronized (cachedRequest) {
             cachedRequest.remove(request);
         }
@@ -90,5 +92,4 @@ public class RequestQueue {
         cacheDispatcher.cancel();
         DominoLog.debug("Request Queue Stopped!");
     }
-
 }

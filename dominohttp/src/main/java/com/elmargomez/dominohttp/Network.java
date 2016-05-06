@@ -16,6 +16,10 @@
 
 package com.elmargomez.dominohttp;
 
+import android.os.Message;
+
+import com.elmargomez.dominohttp.request.Request;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -82,6 +86,7 @@ public class Network {
                 while ((dummy = errorStreamWriter.readLine()) != null) {
                     builder.append(dummy);
                 }
+                DominoLog.error(">>> ex "+builder.toString());
                 response.errorMessage = builder.toString();
             }
 
