@@ -29,7 +29,7 @@ public class DownloadImage extends Request<File, DownloadImage.ImageInfo> {
 
     public DownloadImage(SuccessListener<ImageInfo> successListener,
                          FailedListeners failedListenersListener) {
-        super(successListener, failedListenersListener);
+        super("DownloadImage",successListener, failedListenersListener);
         setContentType(IMAGE_JPEG);
     }
 

@@ -16,8 +16,6 @@
 
 package com.elmargomez.dominohttp.request;
 
-import com.elmargomez.dominohttp.DominoLog;
-
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -30,7 +28,7 @@ public class UploadImageRequest extends Request<File, String> {
 
     public UploadImageRequest(SuccessListener<String> successListenerListener,
                               FailedListeners failedListenersListener) {
-        super(successListenerListener, failedListenersListener);
+        super("UploadImage",successListenerListener, failedListenersListener);
         setContentType(IMAGE_JPEG);
     }
 

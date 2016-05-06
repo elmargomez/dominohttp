@@ -19,7 +19,7 @@ package com.elmargomez.dominohttp.request;
 public class JSONRequest extends Request<String, String> {
 
     public JSONRequest(SuccessListener<String> successListener, FailedListeners failedListenersListener) {
-        super(successListener, failedListenersListener);
+        super("JSONRequest",successListener, failedListenersListener);
         setContentType(APPLICATION_JSON);
     }
 

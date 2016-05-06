@@ -46,6 +46,7 @@ public class NetworkDispatcher extends Thread {
             Request request = null;
             try {
                 request = networkRequest.take();
+                DominoLog.debug("New Network Request [id: " + request.getRequestKey() + "]");
             } catch (InterruptedException e) {
                 if (isInterrupted) {
                     return;
@@ -59,23 +60,10 @@ public class NetworkDispatcher extends Thread {
 
             try {
                 Network.Response networkResponse = network.getNetworkResponse(request);
-                if (networkResponse.responseCode != 200) {
-                    // If we have retry, lets just add this back to the Queue
-                    int r = request.getRetryCount();
-                    if (r > 0) {
-                        request.decRetryCount();
-                        networkRequest.add(request);
-                    } else {
-                        responseSender.failure(request, "Unable to get response!");
-                    }
-                    continue;
-                }
-
                 if (request.shouldCached()) {
                     Cache.Data data = new Cache.Data(networkResponse);
                     cache.put(request.getRequestKey(), data);
                 }
-
                 responseSender.success(request, networkResponse.serverData);
             } catch (IOException e) {
                 int r = request.getRetryCount();
@@ -83,7 +71,7 @@ public class NetworkDispatcher extends Thread {
                     request.decRetryCount();
                     networkRequest.add(request);
                 } else {
-                    responseSender.failure(request, "Exception: " + e.getMessage());
+                    responseSender.failure(request, e.getMessage());
                 }
             }
         }

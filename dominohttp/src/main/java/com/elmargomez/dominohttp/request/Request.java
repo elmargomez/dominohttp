@@ -62,12 +62,15 @@ public abstract class Request<I, R> implements Comparable {
     protected byte[] data;
     private I input;
 
+    private String requestName;
     private int retryCount = 1;
     private boolean shouldCached = true;
     private boolean isCanceled;
     private Object optionalTag;
 
-    public Request(SuccessListener<R> successListener, FailedListeners failedListenersListener) {
+    public Request(String requestName, SuccessListener<R> successListener,
+                   FailedListeners failedListenersListener) {
+        this.requestName = requestName;
         this.successListener = successListener;
         this.failedListenersListener = failedListenersListener;
     }
@@ -99,11 +102,14 @@ public abstract class Request<I, R> implements Comparable {
     public String getRequestKey() {
         if (requestKey == null) {
             StringBuilder builder = new StringBuilder();
+            builder.append(requestName);
+            builder.append("|");
             builder.append(url);
-
+            builder.append("|");
             for (String key : header.keySet()) {
                 builder.append(key);
                 builder.append(header.get(key));
+                builder.append("|");
             }
 
             if (data != null) {

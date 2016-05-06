@@ -16,8 +16,6 @@
 
 package com.elmargomez.dominohttp;
 
-import android.os.Message;
-
 import com.elmargomez.dominohttp.request.Request;
 
 import java.io.BufferedReader;
@@ -34,7 +32,7 @@ import java.util.Map;
 public class Network {
 
     public Response getNetworkResponse(Request request) throws IOException {
-        Response response = new Response();
+
 
         InputStream stream = null;
         OutputStream outputStream = null;
@@ -74,7 +72,6 @@ public class Network {
                 if (headerKey == null && header == null) {
                     break;
                 }
-
                 allHeaders.put(headerKey, header);
             }
 
@@ -82,19 +79,19 @@ public class Network {
                 errorStreamWriter = new BufferedReader(new InputStreamReader(con.getErrorStream()));
                 StringBuilder builder = new StringBuilder();
                 String dummy;
-
                 while ((dummy = errorStreamWriter.readLine()) != null) {
                     builder.append(dummy);
                 }
-                DominoLog.error(">>> ex "+builder.toString());
-                response.errorMessage = builder.toString();
+
+                throw new IOException(builder.toString());
             }
 
-            // parse the data
+            Response response = new Response();
             response.setHeader(allHeaders);
             stream = con.getInputStream();
             response.serverData = getBytes(stream);
             response.responseCode = con.getResponseCode();
+            return response;
 
         } catch (IOException e) {
             throw e;
@@ -109,7 +106,6 @@ public class Network {
                 errorStreamWriter.close();
             }
         }
-        return response;
     }
 
     public HttpURLConnection openConnection(String url) throws IOException {
@@ -143,7 +139,6 @@ public class Network {
         public int responseCode;
         public long ttl;
         public long softTTL;
-        public String errorMessage = "";
 
         // parse the network response
         public void setHeader(HashMap<String, String> headers) {
