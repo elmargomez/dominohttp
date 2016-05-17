@@ -21,6 +21,7 @@ import android.support.annotation.StringDef;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,6 +52,7 @@ public abstract class Request<I, R> implements Comparable {
 
     }
 
+    public final ArrayList<String> tagHolder = new ArrayList<>();
     private SuccessListener<R> successListener;
     private FailedListeners failedListenersListener;
 
@@ -61,9 +63,9 @@ public abstract class Request<I, R> implements Comparable {
     private final HashMap<String, String> header = new HashMap<>();
     protected byte[] data;
     private I input;
-
-    private String requestName;
-    private int retryCount = 1;
+// todo change to private
+    public String requestName;
+    private int retryCount;
     private boolean shouldCached = true;
     private boolean isCanceled;
     private Object optionalTag;

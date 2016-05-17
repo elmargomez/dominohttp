@@ -17,6 +17,10 @@
 package com.elmargomez.dominohttp.request;
 
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Message;
+
+import com.elmargomez.dominohttp.DominoLog;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,14 +33,12 @@ public class DownloadImage extends Request<File, DownloadImage.ImageInfo> {
 
     public DownloadImage(SuccessListener<ImageInfo> successListener,
                          FailedListeners failedListenersListener) {
-        super("DownloadImage",successListener, failedListenersListener);
+        super("DownloadImage", successListener, failedListenersListener);
         setContentType(IMAGE_JPEG);
     }
 
     @Override
     public byte[] getByteData() {
-
-
         return null;
     }
 
@@ -60,21 +62,21 @@ public class DownloadImage extends Request<File, DownloadImage.ImageInfo> {
             stream.write(b, 0, b.length);
             stream.flush();
 
-
             BitmapFactory.Options option = new BitmapFactory.Options();
             option.inJustDecodeBounds = true; // meaning decode only the size and no creation
             BitmapFactory.decodeFile(file.getAbsolutePath(), option);
             imageInfo.width = option.outWidth;
             imageInfo.height = option.outHeight;
-            imageInfo.path = file.toURI().toString();
-
+            imageInfo.path = Uri.fromFile(file).toString();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
-                stream.close();
+                if (stream != null) {
+                    stream.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

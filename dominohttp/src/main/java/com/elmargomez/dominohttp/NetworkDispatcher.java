@@ -38,7 +38,6 @@ public class NetworkDispatcher extends Thread {
         this.responseSender = responseSender;
     }
 
-
     @Override
     public void run() {
         cache.initialize();
@@ -46,7 +45,6 @@ public class NetworkDispatcher extends Thread {
             Request request = null;
             try {
                 request = networkRequest.take();
-                DominoLog.debug("New Network Request [id: " + request.getRequestKey() + "]");
             } catch (InterruptedException e) {
                 if (isInterrupted) {
                     return;
@@ -64,10 +62,15 @@ public class NetworkDispatcher extends Thread {
                     Cache.Data data = new Cache.Data(networkResponse);
                     cache.put(request.getRequestKey(), data);
                 }
+
+                if (request.tagHolder.contains("refresh-cache")) {
+                    continue;
+                }
+
                 responseSender.success(request, networkResponse.serverData);
             } catch (IOException e) {
-                int r = request.getRetryCount();
-                if (r > 0) {
+                int retryCount = request.getRetryCount();
+                if (retryCount > 0) {
                     request.decRetryCount();
                     networkRequest.add(request);
                 } else {

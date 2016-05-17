@@ -20,7 +20,6 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -28,7 +27,7 @@ public class UploadImageRequest extends Request<File, String> {
 
     public UploadImageRequest(SuccessListener<String> successListenerListener,
                               FailedListeners failedListenersListener) {
-        super("UploadImage",successListenerListener, failedListenersListener);
+        super("UploadImage", successListenerListener, failedListenersListener);
         setContentType(IMAGE_JPEG);
     }
 
@@ -46,8 +45,6 @@ public class UploadImageRequest extends Request<File, String> {
                     bStream.write(patch, 0, bytesRead);
                 }
                 data = bStream.toByteArray();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {

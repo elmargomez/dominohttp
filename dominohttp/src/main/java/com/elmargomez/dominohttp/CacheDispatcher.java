@@ -65,6 +65,7 @@ public class CacheDispatcher extends Thread {
 
             responseSender.success(request, data.data);
             if (data.needsRefresh()) {
+                request.tagHolder.add("refresh-cache");
                 networkRequest.add(request);
             }
         }
