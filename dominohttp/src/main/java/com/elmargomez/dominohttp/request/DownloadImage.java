@@ -68,6 +68,7 @@ public class DownloadImage extends Request<File, DownloadImage.ImageInfo> {
             imageInfo.width = option.outWidth;
             imageInfo.height = option.outHeight;
             imageInfo.path = Uri.fromFile(file).toString();
+            imageInfo.filename = filename;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -93,5 +94,6 @@ public class DownloadImage extends Request<File, DownloadImage.ImageInfo> {
         public int width;
         public int height;
         public String path;
+        public String filename;
     }
 }

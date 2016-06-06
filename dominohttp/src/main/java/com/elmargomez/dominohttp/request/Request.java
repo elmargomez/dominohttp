@@ -38,7 +38,7 @@ public abstract class Request<I, R> implements Comparable {
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({GET, PUT, POST})
-    @interface Method {
+    public @interface Method {
 
     }
 
@@ -48,7 +48,7 @@ public abstract class Request<I, R> implements Comparable {
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({APPLICATION_JSON, TEXT_PLAIN, IMAGE_JPEG})
-    @interface ContentType {
+    public @interface ContentType {
 
     }
 
