@@ -16,25 +16,39 @@
 
 package com.elmargomez.dominohttp.data;
 
-import com.elmargomez.dominohttp.inter.ErrorResponse;
-import com.elmargomez.dominohttp.inter.SuccessResponse;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
+import com.elmargomez.dominohttp.RequestQueue;
 
 public class WebRequest {
 
-    protected WebRequest(Object object, int successID, int errorID) {
-        Class<?> classInstance = object.getClass();
-        for (Method method : classInstance.getMethods()) {
-            for (Annotation annotation : method.getAnnotations()) {
-                if (annotation.annotationType() == SuccessResponse.class) {
+    private Header mHeader;
+    private Body mBody;
 
-                } else if (annotation.annotationType() == ErrorResponse.class) {
+    private String mRequestID;
+    private RequestQueue mRequestQueue;
+    private Object mBind;
+    private int mSuccessID = -1;
+    private int mErrorID = -1;
 
-                }
-            }
+    public interface Header {
+        void header(NetworkHeader header);
+    }
+
+    public interface Body {
+        byte[] body();
+    }
+
+    protected WebRequest(RequestQueue requestQueue, Object object, Header header, Body body) {
+        if (header == null) {
+            throw new IllegalArgumentException("Header must not be null!");
         }
+        mRequestQueue = requestQueue;
+        mBind = object;
+        mHeader = header;
+        mBody = body;
+    }
+
+    public void execute() {
+
     }
 
 }

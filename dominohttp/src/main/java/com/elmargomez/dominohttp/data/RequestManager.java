@@ -35,6 +35,14 @@ public class RequestManager {
     private RequestQueue mRequestQueue;
     private List<String> mPendingRequest;
 
+    /**
+     * Initialize our manager.
+     *
+     * @param context
+     * @param bind
+     * @param saveInstanceState
+     * @return
+     */
     public static RequestManager initialize(Context context, Object bind, Bundle saveInstanceState) {
         if (bind == null) {
             throw new IllegalArgumentException("The bind object must not be null!");
@@ -77,8 +85,15 @@ public class RequestManager {
         return SingletonRequestQueue.initialize(mContext).getRequestQueue();
     }
 
-    public WebRequest request(int successID, int errorID) {
-        return new WebRequest(mBind, successID, errorID);
+    /**
+     * Create and Start the request from the network.
+     *
+     * @param header the request header.
+     * @param body   the request body binary.
+     * @return
+     */
+    public WebRequest request(WebRequest.Header header, WebRequest.Body body) {
+        return new WebRequest(mBind, header, body);
     }
 
     /**
