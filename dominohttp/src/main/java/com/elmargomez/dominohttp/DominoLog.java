@@ -19,6 +19,7 @@ package com.elmargomez.dominohttp;
 import android.util.Log;
 
 public class DominoLog {
+
     private static final String LOG_NAME = "Domino Log";
 
     public static void debug(String d) {
