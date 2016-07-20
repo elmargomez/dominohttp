@@ -16,17 +16,17 @@
 
 package com.elmargomez.dominohttp;
 
+import com.elmargomez.dominohttp.data.Network;
 import com.elmargomez.dominohttp.data.WebRequest;
-import com.elmargomez.dominohttp.request.Request;
 
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 public class RequestQueue {
     private static final int MIN_REQUEST_DISPATCHER_COUNT = 4;
 
-    private final BlockingQueue<WebRequest> networkRequest = new ArrayBlockingQueue<>();
-    private final BlockingQueue<WebRequest> cachedRequest = new ArrayBlockingQueue<>();
+    private final BlockingQueue<WebRequest> networkRequest = new PriorityBlockingQueue<>();
+    private final BlockingQueue<WebRequest> cachedRequest = new PriorityBlockingQueue<>();
     private boolean isRunning;
 
     private Cache cache = null;
@@ -57,7 +57,7 @@ public class RequestQueue {
         }
     }
 
-    public synchronized void remove(Request request) {
+    public synchronized void remove(WebRequest request) {
         request.setCanceled(true);
         synchronized (cachedRequest) {
             cachedRequest.remove(request);
@@ -94,4 +94,5 @@ public class RequestQueue {
         cacheDispatcher.cancel();
         DominoLog.debug("Request Queue Stopped!");
     }
+
 }

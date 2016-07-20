@@ -30,7 +30,7 @@ public @interface SuccessResponse {
     int STRING_RESPONSE = 1;
     int BITMAP_RESPONSE = 2;
 
-    @Retention(RetentionPolicy.RUNTIME)
+    @Retention(RetentionPolicy.SOURCE)
     @IntDef({STRING_RESPONSE, BITMAP_RESPONSE})
     @interface Response {
 

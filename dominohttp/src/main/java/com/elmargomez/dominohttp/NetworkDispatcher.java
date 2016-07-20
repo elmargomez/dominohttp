@@ -16,6 +16,7 @@
 
 package com.elmargomez.dominohttp;
 
+import com.elmargomez.dominohttp.data.Network;
 import com.elmargomez.dominohttp.data.WebRequest;
 
 import java.io.IOException;
@@ -61,10 +62,6 @@ public class NetworkDispatcher extends Thread {
                 if (request.shouldCached()) {
                     Cache.Data data = new Cache.Data(networkResponse);
                     cache.put(request.getRequestKey(), data);
-                }
-
-                if (request.tagHolder.contains("refresh-cache")) {
-                    continue;
                 }
 
                 responseSender.success(request, networkResponse.serverData);

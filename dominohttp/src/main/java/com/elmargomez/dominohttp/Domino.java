@@ -18,7 +18,7 @@ package com.elmargomez.dominohttp;
 
 import android.content.Context;
 
-import com.elmargomez.dominohttp.request.Request;
+import com.elmargomez.dominohttp.data.WebRequest;
 
 import java.io.File;
 
@@ -48,11 +48,11 @@ public class Domino {
         requestQueue.stop();
     }
 
-    public void add(Request request) {
+    public void add(WebRequest request) {
         requestQueue.add(request);
     }
 
-    public void remove(Request request) {
+    public void remove(WebRequest request) {
         requestQueue.remove(request);
     }
 

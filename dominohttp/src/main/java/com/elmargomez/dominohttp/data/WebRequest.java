@@ -24,15 +24,14 @@ import com.elmargomez.dominohttp.RequestQueue;
 import com.elmargomez.dominohttp.inter.SuccessResponse;
 import com.elmargomez.dominohttp.parser.BitmapParser;
 import com.elmargomez.dominohttp.parser.StringParser;
-import com.elmargomez.dominohttp.request.Request;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
-public class WebRequest {
+public class WebRequest implements Comparable {
 
-    private Header mHeader;
+    protected Header mHeader;
     private Body mBody;
 
     private NetworkHeader mNetworkHeader = new NetworkHeader();
@@ -69,12 +68,14 @@ public class WebRequest {
         mShouldCached = toCache;
     }
 
-    public void successListener(int id) {
+    public WebRequest successListener(int id) {
         mSuccessID = id;
+        return this;
     }
 
-    public void errorListener(int id) {
+    public WebRequest errorListener(int id) {
         mErrorID = id;
+        return this;
     }
 
     /**
@@ -97,6 +98,11 @@ public class WebRequest {
         mRetryCount--;
     }
 
+    @Override
+    public int compareTo(Object another) {
+        return 0;
+    }
+
     public interface Header {
         void header(NetworkHeader header);
     }
@@ -114,24 +120,28 @@ public class WebRequest {
         if (header == null) {
             throw new IllegalArgumentException("Header must not be null!");
         }
+
         mRequestQueue = requestQueue;
         mBind = object;
         mHeader = header;
         mBody = body;
     }
 
-    public NetworkHeader getHeader() {
-        return mNetworkHeader;
-    }
+//    public NetworkHeader getHeader() {
+//        return mNetworkHeader;
+//    }
+//
+//    public byte[] getBody() {
+//        return mRequestBody;
+//    }
 
-    public byte[] getBody() {
-        return mRequestBody;
-    }
-
+    /**
+     * Start executing the request.
+     */
     public void execute() {
-        if (mHeader != null) {
-            mHeader.header(mNetworkHeader);
-        }
+        // calls the listener
+        mHeader.header(mNetworkHeader);
+        //
         if (mBody != null) {
             mRequestBody = mBody.body();
         }
@@ -180,7 +190,7 @@ public class WebRequest {
         }
 
         public void failure(final WebRequest request, final String error) {
-
+            //TODO complete this part
         }
 
         static class SuccessRunnable implements Runnable {

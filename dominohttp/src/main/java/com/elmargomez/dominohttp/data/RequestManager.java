@@ -28,12 +28,13 @@ import java.util.List;
 
 public class RequestManager {
 
+    // Restore our Array Bundle using this ID
     private static final String RESTORE_BUNDLE = "api_bundle_restoration";
 
     private Context mContext;
     private Object mBind;
     private RequestQueue mRequestQueue;
-    private List<String> mPendingRequest;
+    private List<String> mPendingRequest = new ArrayList<>();
 
     /**
      * Initialize our manager.
@@ -51,7 +52,15 @@ public class RequestManager {
     }
 
     /**
-     * Creates the class and initialize all important instance variable.
+     * <p>
+     * Creates the class and initialize all the pending request(s) behind the scene. To make it
+     * work it is advisable to pass the {@link Bundle} provided by
+     * {@link android.app.Activity#onCreate(Bundle)} and reference our
+     * {@link RequestManager#onSaveInstanceState(Bundle)} within
+     * {@link android.app.Activity#onSaveInstanceState(Bundle)}
+     * so that it will query those pending request again rather than forgetting what
+     * happen a while ago.
+     * </p>
      *
      * @param context           the context to use.
      * @param bind              the object to scan in our reflection.
@@ -63,9 +72,12 @@ public class RequestManager {
         mRequestQueue = getRequestQueue();
         if (saveInstanceState != null) {
             mPendingRequest = saveInstanceState.getStringArrayList(RESTORE_BUNDLE);
-            // TODO : complete here
-        } else {
-            mPendingRequest = new ArrayList<>();
+            if (mPendingRequest != null)
+                return;
+            // TODO
+            for (String requestID : mPendingRequest) {
+
+            }
         }
     }
 
@@ -85,7 +97,7 @@ public class RequestManager {
 
     /**
      * Handles all the threading, networking and caching works. It is recommended to use
-     * Singleton in part so that the work will be centralized.
+     * Singleton so that the work will be centralized.
      *
      * @return the worker Queue.
      */
@@ -101,6 +113,10 @@ public class RequestManager {
      * @return
      */
     public WebRequest request(WebRequest.Header header, WebRequest.Body body) {
+        if (header == null) {
+            throw new IllegalArgumentException("Header must not be null upon creating a Request!");
+        }
+
         WebRequest webRequest = new WebRequest(mRequestQueue, mBind, header, body);
         mPendingRequest.add(webRequest.getRequestKey());
         return webRequest;
@@ -131,7 +147,6 @@ public class RequestManager {
         public RequestQueue getRequestQueue() {
             return requestQueue;
         }
-
     }
 
 }

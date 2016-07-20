@@ -16,6 +16,8 @@
 
 package com.elmargomez.dominohttp;
 
+import com.elmargomez.dominohttp.data.Network;
+
 import java.util.Map;
 
 public interface Cache {

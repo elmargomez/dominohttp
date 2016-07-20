@@ -17,21 +17,20 @@
 package com.elmargomez.dominohttp;
 
 import com.elmargomez.dominohttp.data.WebRequest;
-import com.elmargomez.dominohttp.request.Request;
 
 import java.util.concurrent.BlockingQueue;
 
 public class CacheDispatcher extends Thread {
 
-    private BlockingQueue<Request> networkRequest;
-    private BlockingQueue<Request> cachedRequest;
+    private BlockingQueue<WebRequest> networkRequest;
+    private BlockingQueue<WebRequest> cachedRequest;
     private Cache cache;
     private WebRequest.ResponseSender responseSender;
 
     private boolean isInterrupted;
 
-    public CacheDispatcher(BlockingQueue<Request> networkRequest,
-                           BlockingQueue<Request> cachedRequest, Cache cache,
+    public CacheDispatcher(BlockingQueue<WebRequest> networkRequest,
+                           BlockingQueue<WebRequest> cachedRequest, Cache cache,
                            WebRequest.ResponseSender responseSender) {
         this.networkRequest = networkRequest;
         this.cachedRequest = cachedRequest;
@@ -43,7 +42,7 @@ public class CacheDispatcher extends Thread {
     public void run() {
         cache.initialize();
         while (true) {
-            Request request = null;
+            WebRequest request = null;
             try {
                 request = cachedRequest.take();
                 DominoLog.debug("New Cache Request [id: " + request.getRequestKey() + "]");
@@ -65,10 +64,6 @@ public class CacheDispatcher extends Thread {
             }
 
             responseSender.success(request, data.data);
-            if (data.needsRefresh()) {
-                request.tagHolder.add("refresh-cache");
-                networkRequest.add(request);
-            }
         }
     }
 

@@ -9,44 +9,50 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+import com.elmargomez.dominohttp.data.NetworkHeader;
+import com.elmargomez.dominohttp.data.RequestManager;
+import com.elmargomez.dominohttp.data.WebRequest;
+import com.elmargomez.dominohttp.inter.SuccessResponse;
+
+public class MainActivity extends AppCompatActivity implements WebRequest.Header {
+
+    private static final int IMAGE_REQUEST_ID = 1111;
+    private RequestManager mRequestManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mRequestManager = RequestManager.initialize(this, this, savedInstanceState);
+
+        // Assign the toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Assign our click listener
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
+                mRequestManager.request(MainActivity.this, null)
+                        .successListener(IMAGE_REQUEST_ID)
+                        .execute();
+
             }
         });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    @SuccessResponse(id = IMAGE_REQUEST_ID, responseType = SuccessResponse.BITMAP_RESPONSE)
+    public void exampleImageDownload() {
+
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+    public void header(NetworkHeader header) {
+        header.url = "http://www.example.com";
+        header.setContentType(NetworkHeader.APPLICATION_JSON);
+        header.setMethod(NetworkHeader.POST);
     }
 }

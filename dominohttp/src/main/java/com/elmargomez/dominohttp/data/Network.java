@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.elmargomez.dominohttp;
+package com.elmargomez.dominohttp.data;
 
+import com.elmargomez.dominohttp.DateGenerator;
 import com.elmargomez.dominohttp.data.NetworkHeader;
 import com.elmargomez.dominohttp.data.WebRequest;
 
@@ -33,7 +34,7 @@ import java.util.Map;
 public class Network {
 
     public Response getNetworkResponse(WebRequest request) throws IOException {
-        NetworkHeader webHeader = request.getHeader();
+        NetworkHeader webHeader = request.mHeader;
 
         InputStream stream = null;
         OutputStream outputStream = null;
