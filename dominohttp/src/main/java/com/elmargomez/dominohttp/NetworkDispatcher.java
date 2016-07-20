@@ -16,22 +16,22 @@
 
 package com.elmargomez.dominohttp;
 
-import com.elmargomez.dominohttp.request.Request;
+import com.elmargomez.dominohttp.data.WebRequest;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 
 public class NetworkDispatcher extends Thread {
 
-    private BlockingQueue<Request> networkRequest;
+    private BlockingQueue<WebRequest> networkRequest;
     private Cache cache;
-    private ResponseSender responseSender;
+    private WebRequest.ResponseSender responseSender;
     private Network network;
 
     private boolean isInterrupted;
 
-    public NetworkDispatcher(BlockingQueue<Request> networkRequest, Cache cache, Network network,
-                             ResponseSender responseSender) {
+    public NetworkDispatcher(BlockingQueue<WebRequest> networkRequest, Cache cache, Network network,
+                             WebRequest.ResponseSender responseSender) {
         this.networkRequest = networkRequest;
         this.cache = cache;
         this.network = network;
@@ -42,7 +42,7 @@ public class NetworkDispatcher extends Thread {
     public void run() {
         cache.initialize();
         while (true) {
-            Request request = null;
+            WebRequest request = null;
             try {
                 request = networkRequest.take();
             } catch (InterruptedException e) {

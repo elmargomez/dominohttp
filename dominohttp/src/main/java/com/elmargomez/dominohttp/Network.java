@@ -16,7 +16,8 @@
 
 package com.elmargomez.dominohttp;
 
-import com.elmargomez.dominohttp.request.Request;
+import com.elmargomez.dominohttp.data.NetworkHeader;
+import com.elmargomez.dominohttp.data.WebRequest;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -31,32 +32,32 @@ import java.util.Map;
 
 public class Network {
 
-    public Response getNetworkResponse(Request request) throws IOException {
-
+    public Response getNetworkResponse(WebRequest request) throws IOException {
+        NetworkHeader webHeader = request.getHeader();
 
         InputStream stream = null;
         OutputStream outputStream = null;
         BufferedReader errorStreamWriter = null;
         try {
 
-            HttpURLConnection con = openConnection(request.getURL());
-            con.setRequestMethod(request.getMethod());
+            HttpURLConnection con = openConnection(webHeader.url);
+            con.setRequestMethod(webHeader.method);
             // All header information combined together.
-            HashMap<String, String> allHeaders = new HashMap<>();
-            allHeaders.put("Content-Type", request.getContentType());
-            allHeaders.putAll(request.getHeaders());
+            Map<String, String> allHeaders = new HashMap<>();
+            allHeaders.put("Content-Type", webHeader.contentType);
+            allHeaders.putAll(webHeader.header);
 
             for (String i : allHeaders.keySet()) {
                 con.setRequestProperty(i, allHeaders.get(i));
             }
 
-            if (request.getMethod() == Request.PUT || request.getMethod() == Request.POST) {
+            if (webHeader.method == NetworkHeader.PUT || webHeader.method == NetworkHeader.POST) {
                 con.setDoInput(true);
             }
 
             // getByte data must be executed in other thread.
-            if (request.getMethod() != Request.GET) {
-                byte[] data = request.getByteData();
+            if (webHeader.method != NetworkHeader.GET) {
+                byte[] data = request.getBody();
                 outputStream = con.getOutputStream();
                 outputStream.write(data, 0, data.length);
                 outputStream.flush();
@@ -140,8 +141,8 @@ public class Network {
         public long ttl;
         public long softTTL;
 
-        // parse the network response
-        public void setHeader(HashMap<String, String> headers) {
+        // parse the network responseType
+        public void setHeader(Map<String, String> headers) {
             this.header.putAll(headers);
             long now = System.currentTimeMillis();
 

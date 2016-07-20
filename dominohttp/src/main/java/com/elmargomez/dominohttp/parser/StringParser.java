@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package com.elmargomez.dominohttp.inter;
+package com.elmargomez.dominohttp.parser;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public class StringParser implements BaseParser<String> {
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface ErrorResponse {
-
-    /**
-     * This method is called by the API when the ID matches.
-     *
-     * @return the ID of the success callback.
-     */
-    int id();
+    @Override
+    public String parse(byte[] data) {
+        return new String(data);
+    }
 
 }

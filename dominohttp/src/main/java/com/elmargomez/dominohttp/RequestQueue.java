@@ -16,22 +16,24 @@
 
 package com.elmargomez.dominohttp;
 
+import com.elmargomez.dominohttp.data.WebRequest;
 import com.elmargomez.dominohttp.request.Request;
 
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class RequestQueue {
     private static final int MIN_REQUEST_DISPATCHER_COUNT = 4;
 
-    private final PriorityBlockingQueue<Request> networkRequest = new PriorityBlockingQueue<>();
-    private final PriorityBlockingQueue<Request> cachedRequest = new PriorityBlockingQueue<>();
+    private final BlockingQueue<WebRequest> networkRequest = new ArrayBlockingQueue<>();
+    private final BlockingQueue<WebRequest> cachedRequest = new ArrayBlockingQueue<>();
     private boolean isRunning;
 
     private Cache cache = null;
     private Network network = null;
     private NetworkDispatcher[] dispatchers;
     private CacheDispatcher cacheDispatcher;
-    private ResponseSender sender;
+    private WebRequest.ResponseSender sender;
 
     public RequestQueue(Network network, Cache cache, int dispatcherCount) {
 
@@ -42,14 +44,14 @@ public class RequestQueue {
         this.network = network;
         this.cache = cache;
         this.dispatchers = new NetworkDispatcher[dispatcherCount];
-        this.sender = new ResponseSender();
+        this.sender = new WebRequest.ResponseSender();
     }
 
     public RequestQueue(Cache cache) {
         this(null, cache, MIN_REQUEST_DISPATCHER_COUNT);
     }
 
-    public void add(Request request) {
+    public void add(WebRequest request) {
         synchronized (cachedRequest) {
             cachedRequest.add(request);
         }

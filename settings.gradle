@@ -1,1 +1,1 @@
-include ':dominohttp'
+include ':dominohttp', ':example'

@@ -16,18 +16,86 @@
 
 package com.elmargomez.dominohttp.data;
 
+import android.graphics.Bitmap;
+import android.os.Handler;
+import android.os.Looper;
+
 import com.elmargomez.dominohttp.RequestQueue;
+import com.elmargomez.dominohttp.inter.SuccessResponse;
+import com.elmargomez.dominohttp.parser.BitmapParser;
+import com.elmargomez.dominohttp.parser.StringParser;
+import com.elmargomez.dominohttp.request.Request;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.UUID;
 
 public class WebRequest {
 
     private Header mHeader;
     private Body mBody;
 
+    private NetworkHeader mNetworkHeader = new NetworkHeader();
+    private byte[] mRequestBody;
+
     private String mRequestID;
     private RequestQueue mRequestQueue;
     private Object mBind;
     private int mSuccessID = -1;
     private int mErrorID = -1;
+
+    private boolean mShouldCached = true;
+    private boolean mCanceled = false;
+    private int mRetryCount = 3;
+
+    /**
+     * Check if the request is cancelled.
+     *
+     * @return true if canceled.
+     */
+    public boolean isCanceled() {
+        return mCanceled;
+    }
+
+    public void setCanceled(boolean toCancel) {
+        mCanceled = toCancel;
+    }
+
+    public boolean shouldCached() {
+        return mShouldCached;
+    }
+
+    public void setCachable(boolean toCache) {
+        mShouldCached = toCache;
+    }
+
+    public void successListener(int id) {
+        mSuccessID = id;
+    }
+
+    public void errorListener(int id) {
+        mErrorID = id;
+    }
+
+    /**
+     * The Request ID of this Request.
+     *
+     * @return The Request-ID of this Request.
+     */
+    public String getRequestKey() {
+        if (mRequestID == null) {
+            mRequestID = UUID.randomUUID().toString();
+        }
+        return mRequestID;
+    }
+
+    public int getRetryCount() {
+        return mRetryCount;
+    }
+
+    public void decRetryCount() {
+        mRetryCount--;
+    }
 
     public interface Header {
         void header(NetworkHeader header);
@@ -38,6 +106,11 @@ public class WebRequest {
     }
 
     protected WebRequest(RequestQueue requestQueue, Object object, Header header, Body body) {
+
+        if (object == null) {
+            throw new IllegalArgumentException("Object must not be null!");
+        }
+
         if (header == null) {
             throw new IllegalArgumentException("Header must not be null!");
         }
@@ -47,8 +120,92 @@ public class WebRequest {
         mBody = body;
     }
 
-    public void execute() {
-
+    public NetworkHeader getHeader() {
+        return mNetworkHeader;
     }
 
+    public byte[] getBody() {
+        return mRequestBody;
+    }
+
+    public void execute() {
+        if (mHeader != null) {
+            mHeader.header(mNetworkHeader);
+        }
+        if (mBody != null) {
+            mRequestBody = mBody.body();
+        }
+        mRequestQueue.add(this);
+    }
+
+    public static class ResponseSender {
+        private static final BitmapParser BITMAP_PARSER = new BitmapParser();
+        private static final StringParser STRING_PARSER = new StringParser();
+
+        private Handler handler = null;
+
+        public ResponseSender(Handler handler) {
+            this.handler = handler;
+        }
+
+        public ResponseSender() {
+            this(new Handler(Looper.getMainLooper()));
+        }
+
+        public void success(final WebRequest request, byte[] response) {
+
+            if (request.mSuccessID < 0) {
+                return;
+            }
+
+            Class<?> binder = request.mBind.getClass();
+            for (Method method : binder.getDeclaredMethods()) {
+                SuccessResponse annotation = method.getAnnotation(SuccessResponse.class);
+                if (annotation != null && request.mSuccessID == annotation.id()) {
+                    int i = annotation.responseType();
+                    switch (i) {
+                        case SuccessResponse.BITMAP_RESPONSE:
+                            Bitmap bitmapOutput = BITMAP_PARSER.parse(response);
+                            handler.post(new SuccessRunnable(request.mBind, bitmapOutput, method));
+                            break;
+                        case SuccessResponse.STRING_RESPONSE:
+                            String stringOutput = STRING_PARSER.parse(response);
+                            handler.post(new SuccessRunnable(request.mBind, stringOutput, method));
+                            break;
+                        default:
+                            throw new UnsupportedOperationException("Unable to parse the request!");
+                    }
+                }
+            }
+        }
+
+        public void failure(final WebRequest request, final String error) {
+
+        }
+
+        static class SuccessRunnable implements Runnable {
+
+            private Object mObject;
+            private Object mOutput;
+            private Method mMethod;
+
+            public SuccessRunnable(Object object, Object output, Method method) {
+                mObject = object;
+                mOutput = output;
+                mMethod = method;
+            }
+
+            @Override
+            public void run() {
+                try {
+                    mMethod.invoke(mObject, mOutput);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
 }

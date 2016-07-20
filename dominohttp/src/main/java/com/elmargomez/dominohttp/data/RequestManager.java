@@ -38,10 +38,10 @@ public class RequestManager {
     /**
      * Initialize our manager.
      *
-     * @param context
-     * @param bind
-     * @param saveInstanceState
-     * @return
+     * @param context           the context to use.
+     * @param bind              the object to scan in our reflection.
+     * @param saveInstanceState the bundle that holds the id pf some pending request.
+     * @return {@link RequestManager} instance.
      */
     public static RequestManager initialize(Context context, Object bind, Bundle saveInstanceState) {
         if (bind == null) {
@@ -50,12 +50,20 @@ public class RequestManager {
         return new RequestManager(context, bind, saveInstanceState);
     }
 
+    /**
+     * Creates the class and initialize all important instance variable.
+     *
+     * @param context           the context to use.
+     * @param bind              the object to scan in our reflection.
+     * @param saveInstanceState the bundle that holds the id pf some pending request.
+     */
     private RequestManager(Context context, Object bind, Bundle saveInstanceState) {
         mContext = context;
         mBind = bind;
         mRequestQueue = getRequestQueue();
         if (saveInstanceState != null) {
             mPendingRequest = saveInstanceState.getStringArrayList(RESTORE_BUNDLE);
+            // TODO : complete here
         } else {
             mPendingRequest = new ArrayList<>();
         }
@@ -93,7 +101,9 @@ public class RequestManager {
      * @return
      */
     public WebRequest request(WebRequest.Header header, WebRequest.Body body) {
-        return new WebRequest(mBind, header, body);
+        WebRequest webRequest = new WebRequest(mRequestQueue, mBind, header, body);
+        mPendingRequest.add(webRequest.getRequestKey());
+        return webRequest;
     }
 
     /**
@@ -108,6 +118,7 @@ public class RequestManager {
             File cFile = new File(context.getCacheDir(), "Fcache");
             FileCache cache = new FileCache(cFile);
             requestQueue = new RequestQueue(cache);
+            requestQueue.start();
         }
 
         public static SingletonRequestQueue initialize(Context context) {

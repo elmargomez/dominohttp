@@ -16,6 +16,7 @@
 
 package com.elmargomez.dominohttp;
 
+import com.elmargomez.dominohttp.data.WebRequest;
 import com.elmargomez.dominohttp.request.Request;
 
 import java.util.concurrent.BlockingQueue;
@@ -25,13 +26,13 @@ public class CacheDispatcher extends Thread {
     private BlockingQueue<Request> networkRequest;
     private BlockingQueue<Request> cachedRequest;
     private Cache cache;
-    private ResponseSender responseSender;
+    private WebRequest.ResponseSender responseSender;
 
     private boolean isInterrupted;
 
     public CacheDispatcher(BlockingQueue<Request> networkRequest,
                            BlockingQueue<Request> cachedRequest, Cache cache,
-                           ResponseSender responseSender) {
+                           WebRequest.ResponseSender responseSender) {
         this.networkRequest = networkRequest;
         this.cachedRequest = cachedRequest;
         this.cache = cache;
