@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.elmargomez.dominohttp;
+package com.elmargomez.dominohttp.networking.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

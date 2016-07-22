@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package com.elmargomez.dominohttp.parser;
+package com.elmargomez.dominohttp.networking;
 
-/**
- * Created by deadlydragon00 on 7/20/16.
- */
-public interface BaseParser<T> {
+import com.elmargomez.dominohttp.data.CustomNetwork;
 
-    T parse(byte[] data);
+import java.io.IOException;
+import java.net.HttpURLConnection;
+
+public interface Network {
+
+    CustomNetwork.Response getNetworkResponse(Request request) throws IOException;
+
+    HttpURLConnection openConnection(String url) throws IOException;
 
 }

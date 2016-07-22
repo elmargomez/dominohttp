@@ -14,56 +14,58 @@
  * limitations under the License.
  */
 
-package com.elmargomez.dominohttp;
+package com.elmargomez.dominohttp.networking.worker;
 
-import com.elmargomez.dominohttp.data.WebRequest;
+import com.elmargomez.dominohttp.data.FileCache;
+import com.elmargomez.dominohttp.networking.Cache;
+import com.elmargomez.dominohttp.networking.Callback;
+import com.elmargomez.dominohttp.networking.Request;
 
 import java.util.concurrent.BlockingQueue;
 
 public class CacheDispatcher extends Thread {
 
-    private BlockingQueue<WebRequest> networkRequest;
-    private BlockingQueue<WebRequest> cachedRequest;
-    private Cache cache;
-    private WebRequest.ResponseSender responseSender;
+    private BlockingQueue<Request> mNetworkRequest;
+    private BlockingQueue<Request> mCachedRequest;
+    private Cache mCache;
+    private Callback mCallback;
 
     private boolean isInterrupted;
 
-    public CacheDispatcher(BlockingQueue<WebRequest> networkRequest,
-                           BlockingQueue<WebRequest> cachedRequest, Cache cache,
-                           WebRequest.ResponseSender responseSender) {
-        this.networkRequest = networkRequest;
-        this.cachedRequest = cachedRequest;
-        this.cache = cache;
-        this.responseSender = responseSender;
+    public CacheDispatcher(BlockingQueue<Request> mNetworkRequest,
+                           BlockingQueue<Request> mCachedRequest, Cache cache,
+                           Callback callback) {
+        this.mNetworkRequest = mNetworkRequest;
+        this.mCachedRequest = mCachedRequest;
+        this.mCache = cache;
+        this.mCallback = callback;
     }
 
     @Override
     public void run() {
-        cache.initialize();
+        mCache.initialize();
         while (true) {
-            WebRequest request = null;
+            Request request = null;
             try {
-                request = cachedRequest.take();
-                DominoLog.debug("New Cache Request [id: " + request.getRequestKey() + "]");
+                request = mCachedRequest.take();
             } catch (InterruptedException e) {
                 if (isInterrupted) {
                     break;
                 }
             }
 
-            if (request.isCanceled()) {
+            if (request.state == Request.CANCELED) {
                 // We need to skip this request.
                 continue;
             }
 
-            Cache.Data data = cache.get(request.getRequestKey());
+            FileCache.Data data = mCache.get(request.getRequestKey());
             if (data == null || data.isExpired()) {
-                networkRequest.add(request);
+                mNetworkRequest.add(request);
                 continue;
             }
 
-            responseSender.success(request, data.data);
+            mCallback.success(request, data.data);
         }
     }
 

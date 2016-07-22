@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package com.elmargomez.dominohttp.parser;
+package com.elmargomez.dominohttp.networking;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+public interface Callback {
 
-public class BitmapParser implements BaseParser<Bitmap> {
+    void success(final Request request, final byte[] response);
 
-    @Override
-    public Bitmap parse(byte[] data) {
-        return BitmapFactory.decodeByteArray(data, 0, data.length);
-    }
+    void failure(final Request request, final String error);
 
 }

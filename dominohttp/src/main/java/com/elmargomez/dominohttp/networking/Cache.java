@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package com.elmargomez.dominohttp.parser;
+package com.elmargomez.dominohttp.networking;
 
-public class StringParser implements BaseParser<String> {
+import com.elmargomez.dominohttp.data.FileCache;
 
-    @Override
-    public String parse(byte[] data) {
-        return new String(data);
-    }
+public interface Cache {
+
+    void put(String key, FileCache.Data data);
+
+    FileCache.Data get(String cacheKey);
+
+    void remove(String k);
+
+    void initialize();
 
 }

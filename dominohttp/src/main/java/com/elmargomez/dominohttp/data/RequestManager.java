@@ -19,8 +19,7 @@ package com.elmargomez.dominohttp.data;
 import android.content.Context;
 import android.os.Bundle;
 
-import com.elmargomez.dominohttp.FileCache;
-import com.elmargomez.dominohttp.RequestQueue;
+import com.elmargomez.dominohttp.networking.Request;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,7 +32,6 @@ public class RequestManager {
 
     private Context mContext;
     private Object mBind;
-    private RequestQueue mRequestQueue;
     private List<String> mPendingRequest = new ArrayList<>();
 
     /**
@@ -69,14 +67,14 @@ public class RequestManager {
     private RequestManager(Context context, Object bind, Bundle saveInstanceState) {
         mContext = context;
         mBind = bind;
-        mRequestQueue = getRequestQueue();
         if (saveInstanceState != null) {
             mPendingRequest = saveInstanceState.getStringArrayList(RESTORE_BUNDLE);
-            if (mPendingRequest != null)
-                return;
-            // TODO
-            for (String requestID : mPendingRequest) {
-
+            if (mPendingRequest != null) {
+                for (String requestID : mPendingRequest) {
+                    // TODO
+                }
+            } else {
+                mPendingRequest = new ArrayList<>();
             }
         }
     }
@@ -90,9 +88,7 @@ public class RequestManager {
      *               {@link android.app.Activity#onSaveInstanceState(Bundle)}.
      */
     public void onSaveInstanceState(Bundle bundle) {
-        if (mPendingRequest != null) {
-            bundle.putStringArrayList(RESTORE_BUNDLE, (ArrayList) mPendingRequest);
-        }
+        bundle.putStringArrayList(RESTORE_BUNDLE, (ArrayList) mPendingRequest);
     }
 
     /**
@@ -101,39 +97,28 @@ public class RequestManager {
      *
      * @return the worker Queue.
      */
-    protected RequestQueue getRequestQueue() {
+    protected Request.Queue getRequestQueue() {
         return SingletonRequestQueue.initialize(mContext).getRequestQueue();
     }
 
-    /**
-     * Create and Start the request from the network.
-     *
-     * @param header the request header.
-     * @param body   the request body binary.
-     * @return
-     */
-    public WebRequest request(WebRequest.Header header, WebRequest.Body body) {
-        if (header == null) {
-            throw new IllegalArgumentException("Header must not be null upon creating a Request!");
-        }
 
-        WebRequest webRequest = new WebRequest(mRequestQueue, mBind, header, body);
-        mPendingRequest.add(webRequest.getRequestKey());
-        return webRequest;
+    private void execute(Request request) {
+        getRequestQueue().add(request);
+
     }
 
     /**
-     * Create a singleton instance of {@link RequestQueue}
+     * Create a singleton instance of {@link Request.Queue}
      */
     private static class SingletonRequestQueue {
 
         private static SingletonRequestQueue instance;
-        private RequestQueue requestQueue;
+        private Request.Queue requestQueue;
 
         private SingletonRequestQueue(Context context) {
             File cFile = new File(context.getCacheDir(), "Fcache");
             FileCache cache = new FileCache(cFile);
-            requestQueue = new RequestQueue(cache);
+            requestQueue = new Request.Queue(cache);
             requestQueue.start();
         }
 
@@ -144,7 +129,7 @@ public class RequestManager {
             return instance;
         }
 
-        public RequestQueue getRequestQueue() {
+        public Request.Queue getRequestQueue() {
             return requestQueue;
         }
     }

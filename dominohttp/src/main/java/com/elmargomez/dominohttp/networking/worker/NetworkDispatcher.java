@@ -14,36 +14,43 @@
  * limitations under the License.
  */
 
-package com.elmargomez.dominohttp;
+package com.elmargomez.dominohttp.networking.worker;
 
-import com.elmargomez.dominohttp.data.Network;
-import com.elmargomez.dominohttp.data.WebRequest;
+import com.elmargomez.dominohttp.data.CustomNetwork;
+import com.elmargomez.dominohttp.data.FileCache;
+import com.elmargomez.dominohttp.networking.Cache;
+import com.elmargomez.dominohttp.networking.Callback;
+import com.elmargomez.dominohttp.networking.Network;
+import com.elmargomez.dominohttp.networking.Request;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 
 public class NetworkDispatcher extends Thread {
 
-    private BlockingQueue<WebRequest> networkRequest;
+    private BlockingQueue<Request> networkRequest;
     private Cache cache;
-    private WebRequest.ResponseSender responseSender;
-    private Network network;
+    private Callback responseSender;
+    private Network customNetwork;
 
+    /**
+     * Flag the long running Thread to force stop.
+     */
     private boolean isInterrupted;
 
-    public NetworkDispatcher(BlockingQueue<WebRequest> networkRequest, Cache cache, Network network,
-                             WebRequest.ResponseSender responseSender) {
+    public NetworkDispatcher(BlockingQueue<Request> networkRequest, Cache cache,
+                             Network network, Callback sender) {
         this.networkRequest = networkRequest;
         this.cache = cache;
-        this.network = network;
-        this.responseSender = responseSender;
+        this.customNetwork = network;
+        this.responseSender = sender;
     }
 
     @Override
     public void run() {
         cache.initialize();
         while (true) {
-            WebRequest request = null;
+            Request request = null;
             try {
                 request = networkRequest.take();
             } catch (InterruptedException e) {
@@ -52,23 +59,22 @@ public class NetworkDispatcher extends Thread {
                 }
             }
 
-            if (request.isCanceled()) {
+            if (request.state == Request.CANCELED) {
                 // We need to skip this request.
                 continue;
             }
 
             try {
-                Network.Response networkResponse = network.getNetworkResponse(request);
-                if (request.shouldCached()) {
-                    Cache.Data data = new Cache.Data(networkResponse);
+                CustomNetwork.Response networkResponse = customNetwork.getNetworkResponse(request);
+                if (request.shouldCached) {
+                    FileCache.Data data = new FileCache.Data(networkResponse);
                     cache.put(request.getRequestKey(), data);
                 }
-
                 responseSender.success(request, networkResponse.serverData);
             } catch (IOException e) {
-                int retryCount = request.getRetryCount();
+                int retryCount = request.retryLeft;
                 if (retryCount > 0) {
-                    request.decRetryCount();
+                    request.retryLeft--;
                     networkRequest.add(request);
                 } else {
                     responseSender.failure(request, e.getMessage());

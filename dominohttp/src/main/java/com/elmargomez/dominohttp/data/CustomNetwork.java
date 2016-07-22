@@ -16,9 +16,9 @@
 
 package com.elmargomez.dominohttp.data;
 
-import com.elmargomez.dominohttp.DateGenerator;
-import com.elmargomez.dominohttp.data.NetworkHeader;
-import com.elmargomez.dominohttp.data.WebRequest;
+import com.elmargomez.dominohttp.networking.Request;
+import com.elmargomez.dominohttp.networking.util.DateGenerator;
+import com.elmargomez.dominohttp.networking.Network;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -31,34 +31,33 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Network {
+public class CustomNetwork implements Network {
 
-    public Response getNetworkResponse(WebRequest request) throws IOException {
-        NetworkHeader webHeader = request.mHeader;
+    public Response getNetworkResponse(Request request) throws IOException {
 
         InputStream stream = null;
         OutputStream outputStream = null;
         BufferedReader errorStreamWriter = null;
         try {
 
-            HttpURLConnection con = openConnection(webHeader.url);
-            con.setRequestMethod(webHeader.method);
+            HttpURLConnection con = openConnection(request.url);
+            con.setRequestMethod(request.method);
             // All header information combined together.
             Map<String, String> allHeaders = new HashMap<>();
-            allHeaders.put("Content-Type", webHeader.contentType);
-            allHeaders.putAll(webHeader.header);
+            allHeaders.put("Content-Type", request.contentType);
+            allHeaders.putAll(request.header);
 
             for (String i : allHeaders.keySet()) {
                 con.setRequestProperty(i, allHeaders.get(i));
             }
 
-            if (webHeader.method == NetworkHeader.PUT || webHeader.method == NetworkHeader.POST) {
+            if (request.method == Request.PUT || request.method == Request.POST) {
                 con.setDoInput(true);
             }
 
             // getByte data must be executed in other thread.
-            if (webHeader.method != NetworkHeader.GET) {
-                byte[] data = request.getBody();
+            if (request.method != Request.GET) {
+                byte[] data = request.getRequestByte();
                 outputStream = con.getOutputStream();
                 outputStream.write(data, 0, data.length);
                 outputStream.flush();
@@ -209,6 +208,5 @@ public class Network {
             softTTL = softExpire;
             ttl = finalExpire;
         }
-
     }
 }

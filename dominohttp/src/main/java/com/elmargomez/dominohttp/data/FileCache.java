@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-package com.elmargomez.dominohttp;
+package com.elmargomez.dominohttp.data;
+
+import com.elmargomez.dominohttp.networking.util.DominoLog;
+import com.elmargomez.dominohttp.networking.Cache;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -34,7 +37,7 @@ import java.util.Map;
 public class FileCache implements Cache {
 
     private static final int DEFAULT_DISK_SIZE = 5 * (int) Math.pow(1024.0, 2.0);
-    private Map<String, CacheHeader> headers = new HashMap<>();
+    private Map<String, Header> headers = new HashMap<>();
 
     private long size;
     private final int limitSize;
@@ -76,7 +79,7 @@ public class FileCache implements Cache {
             BufferedInputStream stream = null;
             try {
                 stream = new BufferedInputStream(new FileInputStream(file));
-                CacheHeader header = CacheHeader.readHeader(stream);
+                Header header = Header.readHeader(stream);
                 header.size = file.length();
                 putData(header.cacheKey, header);
             } catch (IOException e) {
@@ -102,7 +105,7 @@ public class FileCache implements Cache {
         File file = getFileForKey(key);
         try {
             BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(file));
-            CacheHeader e = new CacheHeader(key, data);
+            Header e = new Header(key, data);
             boolean success = e.writeHeader(fos);
             if (!success) {
                 fos.close();
@@ -120,7 +123,7 @@ public class FileCache implements Cache {
 
     @Override
     public synchronized Data get(String cacheKey) {
-        CacheHeader entry = headers.get(cacheKey);
+        Header entry = headers.get(cacheKey);
         // if the entry does not exist, return.
         if (entry == null) {
             return null;
@@ -130,7 +133,7 @@ public class FileCache implements Cache {
         SizeInputStream cis = null;
         try {
             cis = new SizeInputStream(new BufferedInputStream(new FileInputStream(file)));
-            CacheHeader.readHeader(cis); // eat header
+            Header.readHeader(cis); // eat header
             byte[] data = writeBytesToStream(cis, (int) (file.length() - cis.bytesRead));
             return entry.toCacheEntry(data);
         } catch (IOException e) {
@@ -154,7 +157,7 @@ public class FileCache implements Cache {
     }
 
     private void removeEntry(String key) {
-        CacheHeader entry = headers.get(key);
+        Header entry = headers.get(key);
         if (entry != null) {
             size -= entry.size;
             headers.remove(key);
@@ -192,10 +195,10 @@ public class FileCache implements Cache {
             return;
         }
 
-        Iterator<Map.Entry<String, CacheHeader>> iterator = headers.entrySet().iterator();
+        Iterator<Map.Entry<String, Header>> iterator = headers.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<String, CacheHeader> entry = iterator.next();
-            CacheHeader e = entry.getValue();
+            Map.Entry<String, Header> entry = iterator.next();
+            Header e = entry.getValue();
             boolean deleted = getFileForKey(e.cacheKey).delete();
             if (deleted) {
                 size -= e.size;
@@ -221,65 +224,14 @@ public class FileCache implements Cache {
         return localFilename;
     }
 
-    private void putData(String key, CacheHeader entry) {
+    private void putData(String key, Header entry) {
         if (!headers.containsKey(key)) {
             size += entry.size;
         } else {
-            CacheHeader oldEntry = headers.get(key);
+            Header oldEntry = headers.get(key);
             size += (entry.size - oldEntry.size);
         }
         headers.put(key, entry);
-    }
-
-    static class CacheHeader {
-        public long size;
-        public String cacheKey;
-        public Map<String, String> header;
-        public long ttl;
-        public long softTTL;
-
-        public CacheHeader() {
-        }
-
-        public CacheHeader(String cacheKey, Data data) {
-            size = data.data.length;
-            this.cacheKey = cacheKey;
-            header = data.header;
-            ttl = data.ttl;
-            softTTL = data.softTTL;
-        }
-
-        public static CacheHeader readHeader(InputStream is) throws IOException {
-            CacheHeader entry = new CacheHeader();
-            entry.cacheKey = readString(is);
-            entry.header = readStringStringMap(is);
-            entry.ttl = readLong(is);
-            entry.softTTL = readLong(is);
-            return entry;
-        }
-
-        public boolean writeHeader(OutputStream os) {
-            try {
-                writeString(os, cacheKey);
-                writeStringStringMap(header, os);
-                writeLong(os, ttl);
-                writeLong(os, softTTL);
-                os.flush();
-                return true;
-            } catch (IOException e) {
-                return false;
-            }
-        }
-
-        public Data toCacheEntry(byte[] data) {
-            Data e = new Data();
-            e.data = data;
-            e.ttl = ttl;
-            e.softTTL = softTTL;
-            e.header = header;
-            return e;
-        }
-
     }
 
     private static byte[] writeBytesToStream(InputStream in, int length) throws IOException {
@@ -379,4 +331,83 @@ public class FileCache implements Cache {
         return result;
     }
 
+
+    static class Header {
+        public long size;
+        public String cacheKey;
+        public Map<String, String> header;
+        public long ttl;
+        public long softTTL;
+
+        public Header() {
+
+        }
+
+        public Header(String cacheKey, Data data) {
+            size = data.data.length;
+            this.cacheKey = cacheKey;
+            header = data.header;
+            ttl = data.ttl;
+            softTTL = data.softTTL;
+        }
+
+        public static Header readHeader(InputStream is) throws IOException {
+            Header entry = new Header();
+            entry.cacheKey = readString(is);
+            entry.header = readStringStringMap(is);
+            entry.ttl = readLong(is);
+            entry.softTTL = readLong(is);
+            return entry;
+        }
+
+        public boolean writeHeader(OutputStream os) {
+            try {
+                writeString(os, cacheKey);
+                writeStringStringMap(header, os);
+                writeLong(os, ttl);
+                writeLong(os, softTTL);
+                os.flush();
+                return true;
+            } catch (IOException e) {
+                return false;
+            }
+        }
+
+        public Data toCacheEntry(byte[] data) {
+            Data e = new Data();
+            e.data = data;
+            e.ttl = ttl;
+            e.softTTL = softTTL;
+            e.header = header;
+            return e;
+        }
+
+    }
+
+    public static class Data {
+        public Map<String, String> header;
+        public String cacheID;
+        public long ttl;
+        public long softTTL;
+        public byte[] data;
+
+        public Data(){
+
+        }
+
+        public Data(CustomNetwork.Response networkResponse) {
+            header = networkResponse.header;
+            data = networkResponse.serverData;
+            ttl = networkResponse.ttl;
+            softTTL = networkResponse.softTTL;
+        }
+
+        public boolean isExpired() {
+            return ttl < System.currentTimeMillis();
+        }
+
+        public boolean needsRefresh() {
+            return softTTL < System.currentTimeMillis();
+        }
+    }
 }
